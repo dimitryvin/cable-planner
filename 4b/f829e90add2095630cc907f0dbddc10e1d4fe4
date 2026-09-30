@@ -1,0 +1,28 @@
+src/views/plan/PlanScene.tsx
+  s_6e6971b8198af2::t_bab7f74bfed5e4 287-294,298-299
+src/views/DeskView.tsx
+  s_6e6971b8198af2::t_68a654c209bb5d 1-71
+tsconfig.tsbuildinfo
+  s_6e6971b8198af2::t_68a654c209bb5d 1
+src/styles/app.css
+  s_6e6971b8198af2::t_68a654c209bb5d 185-189
+  s_6e6971b8198af2::t_bab7f74bfed5e4 190
+src/views/ViewArea.tsx
+  s_6e6971b8198af2::t_68a654c209bb5d 4,11-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4bf829e90add2095630cc907f0dbddc10e1d4fe4",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
