@@ -1,0 +1,27 @@
+src/state/ui.tsx
+  s_6e6971b8198af2::t_3311ac9e41f798 5,32-33,55,75-76,90
+src/views/elevation/projection.test.ts
+  s_6e6971b8198af2::t_97124ce49a275b 1-23,25-44
+  s_6e6971b8198af2::t_3311ac9e41f798 24
+src/views/elevation/projection.ts
+  s_6e6971b8198af2::t_97124ce49a275b 1-81
+src/views/ElevationView.tsx
+  s_6e6971b8198af2::t_00be386b97c40b 294
+  s_6e6971b8198af2::t_3311ac9e41f798 3,15,17,24,30-31,33,39-40,42-43,57-64,67,69,73,79,86,94,168,236-237,270-271,281,284-292
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "18d544f9a8d0a11a46ea3cf9db4b2cc90575ed36",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
