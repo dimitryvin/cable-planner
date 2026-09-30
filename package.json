@@ -3,6 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "description": "Local-first planner for home-office cable management: model your room, desk and devices, auto-route cables, and get lengths, power budgets and a shopping list.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dimitryvin/cable-planner.git"
+  },
+  "homepage": "https://cables.dimitryvin.com",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -4,7 +4,7 @@ Plan every cable run in your home office before you buy or drill anything.
 
 Cable Planner is a local-first web app. You describe your room, desks, devices and cable-management gear with tape-measure dimensions; it routes every cable automatically (hugging walls, using trays, grommets and spines), then tells you exactly what length to buy, whether your power strips are overloaded, where bundles form, and in what order to install everything.
 
-Everything runs in your browser. Layouts are saved to `localStorage` and can be exported/imported as JSON for backup and version control.
+Try it at **https://cables.dimitryvin.com**. Everything runs in your browser. Layouts are saved to `localStorage` and can be exported/imported as JSON for backup and version control.
 
 ## Features
 
@@ -20,6 +20,14 @@ Everything runs in your browser. Layouts are saved to `localStorage` and can be 
   - Bundle detection with estimated diameters, checked against tray, grommet, spine and clip capacity.
   - Warnings for power/data parallel runs, passive-cable length limits (USB, Thunderbolt, HDMI 2.1, DisplayPort), unsupported spans, open-floor crossings and paths through beams.
 - **Outputs**: shopping list, 3D-printable parts (dimensions in mm with clearance), wiring table, install checklist, and power budget, exported as CSV or Markdown, plus a print stylesheet.
+
+## Self-hosting with Docker
+
+```sh
+docker compose up -d --build   # serves on http://127.0.0.1:3095
+```
+
+The image runs the test suite, builds the app, and serves the static files from an unprivileged nginx container (port 8080 inside, bound to loopback by `compose.yaml`). Put your own reverse proxy with TLS in front of it. Set `CABLE_PLANNER_PORT` to change the host port.
 
 ## Getting started
 
@@ -64,3 +72,7 @@ Spec length limits and cable diameters live in `SPECS` in `src/model/defaults.ts
 ## Dependencies
 
 Runtime: React only. Tooling: Vite, TypeScript and Vitest. No UI kit, state library or JSX plugin.
+
+## License
+
+[MIT](LICENSE)
