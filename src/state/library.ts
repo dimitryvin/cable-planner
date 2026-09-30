@@ -239,10 +239,12 @@ export function deleteLayout(
   makeEmpty: () => Layout,
   deps: LibraryDeps = {},
 ): { index: LibraryIndex; layout?: Layout } {
-  storage.removeItem(layoutKey(id));
+  // The index is written before the data is removed, so a refused write never
+  // leaves a list entry pointing at nothing.
   let next: LibraryIndex = { ...index, layouts: index.layouts.filter((e) => e.id !== id) };
   if (index.currentId !== id) {
     writeIndex(storage, next);
+    storage.removeItem(layoutKey(id));
     return { index: next };
   }
   for (const e of [...next.layouts].sort((a, b) => b.updatedAt - a.updatedAt)) {
@@ -250,10 +252,42 @@ export function deleteLayout(
     if (layout) {
       next = { ...next, currentId: e.id };
       writeIndex(storage, next);
+      storage.removeItem(layoutKey(id));
       return { index: next, layout };
     }
   }
-  const created = createLayout(storage, next, makeEmpty(), deps);
-  return { index: created.index, layout: loadLayoutById(storage, created.id) };
+  const empty = makeEmpty();
+  const created = createLayout(storage, next, empty, deps);
+  storage.removeItem(layoutKey(id));
+  return { index: created.index, layout: empty };
 }
 
+export interface SafeOpenResult extends OpenResult {
+  storage: LibraryStorage;
+  /** Storage refused writes; everything is kept in memory for this session. */
+  degraded: boolean;
+}
+
+/**
+ * Opens the library, falling back to an in-memory copy of the saved data when
+ * the browser refuses writes (storage full or blocked), so the app still loads.
+ * Nothing is written to the real storage in that case.
+ */
+export function openLibrarySafely(storage: LibraryStorage, deps: LibraryDeps = {}): SafeOpenResult {
+  try {
+    return { ...openLibrary(storage, deps), storage, degraded: false };
+  } catch {
+    const memory = new MemoryStorage();
+    try {
+      for (let i = 0; i < storage.length; i++) {
+        const key = storage.key(i);
+        if (!key?.startsWith('cable-planner:')) continue;
+        const value = storage.getItem(key);
+        if (value !== null) memory.setItem(key, value);
+      }
+    } catch {
+      /* unreadable storage: start from an empty in-memory library */
+    }
+    return { ...openLibrary(memory, deps), storage: memory, degraded: true };
+  }
+}

@@ -71,6 +71,11 @@ export function App() {
         </button>
       </header>
       {error && <div className="error-banner" onClick={() => setError(undefined)}>{error}</div>}
+      {library.error && (
+        <div className="error-banner" onClick={library.clearError}>
+          {library.error}
+        </div>
+      )}
       {library.saveFailed && (
         <div className="error-banner">Couldn't save changes in this browser (storage is full or blocked). Use Export to keep a copy.</div>
       )}

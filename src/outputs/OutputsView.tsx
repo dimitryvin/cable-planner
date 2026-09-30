@@ -34,23 +34,36 @@ function ExportButtons({ name, table, markdown }: { name: string; table?: Table;
   );
 }
 
-function readChecked(storageKey: string): Record<string, boolean> {
+/**
+ * Ticks for a layout. Earlier versions keyed them by layout name; those are
+ * used until the layout gets ticks of its own (the old key is left in place).
+ */
+export function readChecked(storage: Pick<Storage, 'getItem'>, storageKey: string, legacyKey: string): Record<string, boolean> {
   try {
-    return JSON.parse(localStorage.getItem(storageKey) ?? '{}') as Record<string, boolean>;
+    const raw = storage.getItem(storageKey) ?? storage.getItem(legacyKey);
+    return raw ? (JSON.parse(raw) as Record<string, boolean>) : {};
   } catch {
     return {};
   }
 }
 
 /** Checklist ticks per layout; reloaded when the open layout changes. */
-function useChecked(key: string) {
-  const storageKey = `cable-planner:checklist:${key}`;
-  const [state, setState] = useState(() => ({ storageKey, checked: readChecked(storageKey) }));
-  const checked = state.storageKey === storageKey ? state.checked : readChecked(storageKey);
+function useChecked(id: string, name: string) {
+  const storageKey = `cable-planner:checklist:${id}`;
+  const legacyKey = `cable-planner:checklist:${name}`;
+  const load = () => {
+    try {
+      return readChecked(localStorage, storageKey, legacyKey);
+    } catch {
+      return {};
+    }
+  };
+  const [state, setState] = useState(() => ({ storageKey, checked: load() }));
+  const checked = state.storageKey === storageKey ? state.checked : load();
   if (state.storageKey !== storageKey) setState({ storageKey, checked });
 
-  const toggle = (id: string) => {
-    const next = { ...checked, [id]: !checked[id] };
+  const toggle = (itemId: string) => {
+    const next = { ...checked, [itemId]: !checked[itemId] };
     setState({ storageKey, checked: next });
     try {
       localStorage.setItem(storageKey, JSON.stringify(next));
@@ -65,7 +78,7 @@ export function OutputsView() {
   const { layout, library } = useLayout();
   const { analysis, select } = useUi();
   const [tab, setTab] = useState<Tab>('shopping');
-  const [checked, toggle] = useChecked(library.currentId);
+  const [checked, toggle] = useChecked(library.currentId, layout.name);
 
   const shopping = shoppingList(layout, analysis);
   const parts = printParts(layout, analysis);

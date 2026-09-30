@@ -9,6 +9,7 @@ import {
   LEGACY_KEY,
   loadLayoutById,
   openLibrary,
+  openLibrarySafely,
   readIndex,
   saveLayout,
   switchLayout,
@@ -159,5 +160,45 @@ describe('layout library', () => {
     const r = saveLayout(s, a.index, a.index.currentId, named('X'), d);
     expect(r.ok).toBe(false);
     expect(r.index).toBe(a.index);
+  });
+});
+
+describe('layout library under storage failure', () => {
+  it('opens from an in-memory copy when writes are refused, leaving storage untouched', () => {
+    const s = new MemoryStorage();
+    const legacyRaw = JSON.stringify(named('Real office'));
+    s.setItem(LEGACY_KEY, legacyRaw);
+    s.failWrites = true;
+    const r = openLibrarySafely(s, deps());
+    expect(r.degraded).toBe(true);
+    expect(r.layout.name).toBe('Real office');
+    expect(s.getItem(INDEX_KEY)).toBeNull();
+    expect(s.getItem(LEGACY_KEY)).toBe(legacyRaw);
+    // Later operations go to the in-memory copy and keep working.
+    const c = createLayout(r.storage, r.index, named('Scratch'), deps());
+    expect(loadLayoutById(r.storage, c.id)?.name).toBe('Scratch');
+  });
+
+  it('never leaves a list entry without data when deleting fails', () => {
+    const s = new MemoryStorage();
+    const d = deps();
+    const a = openLibrary(s, d);
+    const b = createLayout(s, a.index, named('B'), d);
+    s.failWrites = true;
+    expect(() => deleteLayout(s, b.index, a.index.currentId, () => emptyLayout(), d)).toThrow();
+    s.failWrites = false;
+    const idx = readIndex(s)!;
+    for (const e of idx.layouts) expect(loadLayoutById(s, e.id)).toBeDefined();
+  });
+});
+
+describe('checklist ticks', () => {
+  it('fall back to the old name-keyed ticks until the layout has its own', async () => {
+    const { readChecked } = await import('../outputs/OutputsView');
+    const s = new MemoryStorage();
+    s.setItem('cable-planner:checklist:My office', JSON.stringify({ a: true }));
+    expect(readChecked(s, 'cable-planner:checklist:id1', 'cable-planner:checklist:My office')).toEqual({ a: true });
+    s.setItem('cable-planner:checklist:id1', JSON.stringify({ b: true }));
+    expect(readChecked(s, 'cable-planner:checklist:id1', 'cable-planner:checklist:My office')).toEqual({ b: true });
   });
 });

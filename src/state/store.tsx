@@ -8,7 +8,7 @@ import {
   deleteLayout,
   INDEX_KEY,
   MemoryStorage,
-  openLibrary,
+  openLibrarySafely,
   readIndex,
   saveLayout,
   switchLayout,
@@ -22,6 +22,9 @@ export interface LayoutLibrary {
   currentId: string;
   /** The last save was refused by the browser (quota, private mode). */
   saveFailed: boolean;
+  /** Why the last layout operation was refused, if it was. */
+  error?: string;
+  clearError: () => void;
   open: (id: string) => void;
   /** Adds a layout as a new entry and opens it. */
   add: (layout: Layout) => void;
@@ -47,16 +50,14 @@ const LayoutContext = createContext<LayoutStore | null>(null);
 const SAVE_DEBOUNCE_MS = 300;
 
 export function LayoutProvider({ children, initial }: { children: ReactNode; initial?: Layout }) {
-  const storageRef = useRef<LibraryStorage | null>(null);
-  if (!storageRef.current) storageRef.current = initial ? new MemoryStorage() : browserStorage();
-  const storage = storageRef.current;
-
   const [opened] = useState(() => {
-    const r = openLibrary(storage);
+    const r = openLibrarySafely(initial ? new MemoryStorage() : browserStorage());
     return initial ? { ...r, layout: initial } : r;
   });
+  const storage: LibraryStorage = opened.storage;
   const [index, setIndex] = useState<LibraryIndex>(opened.index);
-  const [saveFailed, setSaveFailed] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(opened.degraded);
+  const [error, setError] = useState<string>();
   const [history, dispatch] = useReducer(historyReducer, undefined, () => initHistory(opened.layout));
 
   // The layout object last loaded or saved; saving is skipped while nothing changed,
@@ -68,13 +69,14 @@ export function LayoutProvider({ children, initial }: { children: ReactNode; ini
   const latest = useRef(history.present);
   latest.current = history.present;
 
-  const flush = useCallback(() => {
+  /** Saves pending edits now. Returns false if the browser refused the save. */
+  const flush = useCallback((): boolean => {
     if (pending.current) {
       clearTimeout(pending.current);
       pending.current = null;
     }
     const layout = latest.current;
-    if (layout === persisted.current) return;
+    if (layout === persisted.current) return true;
     const r = saveLayout(storage, indexRef.current, indexRef.current.currentId, layout);
     setSaveFailed(!r.ok);
     if (r.ok) {
@@ -82,7 +84,28 @@ export function LayoutProvider({ children, initial }: { children: ReactNode; ini
       indexRef.current = r.index;
       setIndex(r.index);
     }
+    return r.ok;
   }, [storage]);
+
+  /**
+   * Runs a layout operation only after the open layout's edits are safely
+   * saved, so a refused save never leads to silently discarded work.
+   */
+  const guarded = useCallback(
+    (what: string, op: () => void, requireSaved = true) => {
+      if (requireSaved && !flush()) {
+        setError(`Couldn't save "${latest.current.name}", so I didn't ${what}. Export it or free up browser storage first.`);
+        return;
+      }
+      try {
+        op();
+        setError(undefined);
+      } catch {
+        setError(`Couldn't ${what}: the browser refused to save. Export your rooms or free up browser storage.`);
+      }
+    },
+    [flush],
+  );
 
   useEffect(() => {
     if (history.present === persisted.current) return;
@@ -128,34 +151,42 @@ export function LayoutProvider({ children, initial }: { children: ReactNode; ini
       entries: index.layouts,
       currentId: index.currentId,
       saveFailed,
+      error,
+      clearError: () => setError(undefined),
       open: (id) => {
         if (id === indexRef.current.currentId) return;
-        flush();
-        const r = switchLayout(storage, indexRef.current, id);
-        if (r) openLayout(r.index, r.layout);
+        guarded('switch rooms', () => {
+          const r = switchLayout(storage, indexRef.current, id);
+          if (r) openLayout(r.index, r.layout);
+        });
       },
-      add: (layout) => {
-        flush();
-        const r = createLayout(storage, indexRef.current, layout);
-        openLayout(r.index, layout);
-      },
-      duplicate: () => {
-        flush();
-        const copy = { ...latest.current, name: `${latest.current.name} copy` };
-        const r = createLayout(storage, indexRef.current, copy);
-        openLayout(r.index, copy);
-      },
-      remove: (id) => {
-        flush();
-        const r = deleteLayout(storage, indexRef.current, id, () => emptyLayout());
-        if (r.layout) openLayout(r.index, r.layout);
-        else {
-          indexRef.current = r.index;
-          setIndex(r.index);
-        }
-      },
+      add: (layout) =>
+        guarded('add a room', () => {
+          const r = createLayout(storage, indexRef.current, layout);
+          openLayout(r.index, layout);
+        }),
+      duplicate: () =>
+        guarded('duplicate the room', () => {
+          const copy = { ...latest.current, name: `${latest.current.name} copy` };
+          const r = createLayout(storage, indexRef.current, copy);
+          openLayout(r.index, copy);
+        }),
+      remove: (id) =>
+        // Deleting the open room discards its edits anyway, so it needn't save first.
+        guarded(
+          'delete the room',
+          () => {
+            const r = deleteLayout(storage, indexRef.current, id, () => emptyLayout());
+            if (r.layout) openLayout(r.index, r.layout);
+            else {
+              indexRef.current = r.index;
+              setIndex(r.index);
+            }
+          },
+          id !== indexRef.current.currentId,
+        ),
     }),
-    [index, saveFailed, storage, flush, openLayout],
+    [index, saveFailed, error, storage, guarded, openLayout],
   );
 
   const store = useMemo<LayoutStore>(
