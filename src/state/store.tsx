@@ -22,6 +22,8 @@ export interface LayoutLibrary {
   currentId: string;
   /** The last save was refused by the browser (quota, private mode). */
   saveFailed: boolean;
+  /** Storage refused writes at startup: everything lives in memory until the tab closes. */
+  memoryOnly: boolean;
   /** Why the last layout operation was refused, if it was. */
   error?: string;
   clearError: () => void;
@@ -48,6 +50,8 @@ export interface LayoutStore {
 const LayoutContext = createContext<LayoutStore | null>(null);
 
 const SAVE_DEBOUNCE_MS = 300;
+
+const shortName = (name: string) => (name.length > 40 ? `${name.slice(0, 39)}…` : name);
 
 export function LayoutProvider({ children, initial }: { children: ReactNode; initial?: Layout }) {
   const [opened] = useState(() => {
@@ -94,7 +98,7 @@ export function LayoutProvider({ children, initial }: { children: ReactNode; ini
   const guarded = useCallback(
     (what: string, op: () => void, requireSaved = true) => {
       if (requireSaved && !flush()) {
-        setError(`Couldn't save "${latest.current.name}", so I didn't ${what}. Export it or free up browser storage first.`);
+        setError(`Couldn't save "${shortName(latest.current.name)}", so I didn't ${what}. Export it or free up browser storage first.`);
         return;
       }
       try {
@@ -150,7 +154,9 @@ export function LayoutProvider({ children, initial }: { children: ReactNode; ini
     () => ({
       entries: index.layouts,
       currentId: index.currentId,
-      saveFailed,
+      // In memory-only mode saves "succeed" against the in-memory copy, so the warning must not clear.
+      saveFailed: saveFailed || opened.degraded,
+      memoryOnly: opened.degraded,
       error,
       clearError: () => setError(undefined),
       open: (id) => {
@@ -186,7 +192,7 @@ export function LayoutProvider({ children, initial }: { children: ReactNode; ini
           id !== indexRef.current.currentId,
         ),
     }),
-    [index, saveFailed, error, storage, guarded, openLayout],
+    [index, saveFailed, error, storage, guarded, openLayout, opened.degraded],
   );
 
   const store = useMemo<LayoutStore>(

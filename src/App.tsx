@@ -70,15 +70,21 @@ export function App() {
           {theme === 'dark' ? 'Light' : 'Dark'}
         </button>
       </header>
-      {error && <div className="error-banner" onClick={() => setError(undefined)}>{error}</div>}
-      {library.error && (
-        <div className="error-banner" onClick={library.clearError}>
-          {library.error}
-        </div>
-      )}
-      {library.saveFailed && (
-        <div className="error-banner">Couldn't save changes in this browser (storage is full or blocked). Use Export to keep a copy.</div>
-      )}
+      <div className="banners">
+        {error && <div className="error-banner" onClick={() => setError(undefined)}>{error}</div>}
+        {library.error && (
+          <div className="error-banner" onClick={library.clearError}>
+            {library.error}
+          </div>
+        )}
+        {library.saveFailed && (
+          <div className="error-banner">
+            {library.memoryOnly
+              ? "This browser isn't letting the app save (storage is full or blocked). Your changes only last until you close this tab. Use Export to keep a copy."
+              : "Couldn't save changes in this browser (storage is full or blocked). Use Export to keep a copy."}
+          </div>
+        )}
+      </div>
       <div className="main">
         <aside className="pane left">
           <div className="tabs">
