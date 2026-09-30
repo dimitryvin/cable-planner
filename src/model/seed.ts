@@ -150,7 +150,7 @@ export function exampleLayout(): Layout {
     connect(portOf(dock, 'ethernet'), portOf(router, 'ethernet', 1), 'Dock → router'),
     connect(portOf(router, 'ethernet', 0), portOf(jack, 'ethernet', 0), 'Router WAN'),
     connect(portOf(router, 'dc'), portOf(outletE, 'ac', 0), 'Router power'),
-    connect(portOf(lamp, 'ac'), portOf(outletE, 'ac', 1), 'Lamp power'),
+    connect(portOf(lamp, 'ac'), portOf(outletN, 'ac', 1), 'Lamp power'),
   ];
 
   return {

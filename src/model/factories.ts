@@ -145,5 +145,6 @@ export function makeCable(
     spec: defaultSpec(fromType, toType),
     routing: 'auto',
     waypoints: [],
+    source: fromType === 'ac' || fromType === 'dc' || toType === 'ac' || toType === 'dc' ? 'included' : 'buy',
   };
 }

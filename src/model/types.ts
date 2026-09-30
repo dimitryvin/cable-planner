@@ -296,6 +296,11 @@ export interface Cable {
   /** Outer diameter; falls back to a per-spec default. */
   diameter?: Inches;
   /**
+   * 'buy' goes on the shopping list; 'owned' is already on hand; 'included'
+   * ships with a device (e.g. a power cord), so its length is only checked.
+   */
+  source: 'buy' | 'owned' | 'included';
+  /**
    * Set for cords permanently attached to a device or strip (e.g. a power
    * strip's cord). Excluded from the shopping list; routed length beyond this
    * value is reported as "can't reach".
