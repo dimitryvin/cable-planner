@@ -12,11 +12,14 @@ export function AutoConnectBanner() {
   };
   const nothing = r.added.length === 0 && r.unresolved.length === 0;
   return (
-    <div className={`auto-banner ${r.unresolved.length ? 'partial' : 'ok'}`} role="status">
+    <div className="auto-banner" role="status">
       <div className="auto-head">
-        <b>Auto-connect ({r.scope}):</b>{' '}
-        {nothing ? 'everything is already connected.' : `added ${r.added.length} cable${r.added.length === 1 ? '' : 's'}`}
-        {r.unresolved.length > 0 && `, ${r.unresolved.length} couldn't be connected`}
+        <span className={`sev ${r.unresolved.length ? 'warn' : 'ok'}`} aria-hidden="true" />
+        <span>
+          <b>Auto-connect ({r.scope}):</b>{' '}
+          {nothing ? 'everything is already connected.' : `added ${r.added.length} cable${r.added.length === 1 ? '' : 's'}`}
+          {r.unresolved.length > 0 && `, ${r.unresolved.length} couldn't be connected`}
+        </span>
         <button className="icon-btn" aria-label="Dismiss" onClick={() => setAutoReport(null)}>×</button>
       </div>
       {r.unresolved.length > 0 && (
