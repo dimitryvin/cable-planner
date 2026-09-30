@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { emptyLayout, exampleLayout } from './model/seed';
-import { deserializeLayout, downloadText, serializeLayout } from './state/persistence';
+import { useEffect, useState } from 'react';
+import { downloadText, serializeLayout } from './state/persistence';
+import { LayoutsMenu } from './panels/LayoutsMenu';
 import { useLayout } from './state/store';
 import { useUi, type ViewName } from './state/ui';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -31,10 +31,9 @@ function initialTheme(): Theme {
 }
 
 export function App() {
-  const { layout, apply, undo, redo, replace, canUndo, canRedo } = useLayout();
+  const { layout, apply, undo, redo, canUndo, canRedo, library } = useLayout();
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [error, setError] = useState<string>();
-  const fileInput = useRef<HTMLInputElement>(null);
   const [leftTab, setLeftTab] = useState<'room' | 'library'>('room');
   const { view, setView, cableMode, setCableMode, select } = useUi();
   useKeyboardShortcuts();
@@ -49,39 +48,14 @@ export function App() {
     }
   }, [theme]);
 
-  const onImport = async (file: File) => {
-    const result = deserializeLayout(await file.text());
-    if (result.ok) {
-      replace(result.layout);
-      setError(undefined);
-    } else {
-      setError(`Import failed: ${result.error}`);
-    }
-  };
-
   const slug = layout.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'layout';
 
   return (
     <div className="app">
       <header className="toolbar">
         <h1>Cable Planner</h1>
-        <button className="btn" onClick={() => confirm('Start a new empty layout?') && replace(emptyLayout())}>
-          New
-        </button>
-        <button className="btn" onClick={() => replace(exampleLayout())}>Load example</button>
-        <button className="btn" onClick={() => fileInput.current?.click()}>Import</button>
-        <button className="btn" onClick={() => downloadText(`${slug}.json`, serializeLayout(layout))}>Export</button>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="application/json,.json"
-          hidden
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void onImport(f);
-            e.target.value = '';
-          }}
-        />
+        <LayoutsMenu onError={setError} />
+        <button className="btn" onClick={() => downloadText(`${slug}.json`, serializeLayout(layout))} title="Download this room as a JSON file">Export</button>
         <button className="btn" disabled={!canUndo} onClick={undo} title="Undo (⌘Z)">Undo</button>
         <button className="btn" disabled={!canRedo} onClick={redo} title="Redo (⇧⌘Z)">Redo</button>
         <div className="spacer" />
@@ -97,6 +71,9 @@ export function App() {
         </button>
       </header>
       {error && <div className="error-banner" onClick={() => setError(undefined)}>{error}</div>}
+      {library.saveFailed && (
+        <div className="error-banner">Couldn't save changes in this browser (storage is full or blocked). Use Export to keep a copy.</div>
+      )}
       <div className="main">
         <aside className="pane left">
           <div className="tabs">

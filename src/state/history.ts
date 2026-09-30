@@ -13,7 +13,9 @@ export type HistoryAction =
   | { type: 'endGesture' }
   | { type: 'undo' }
   | { type: 'redo' }
-  | { type: 'replace'; layout: Layout };
+  | { type: 'replace'; layout: Layout }
+  /** Open a different layout: fresh history, nothing to undo into the previous one. */
+  | { type: 'reset'; layout: Layout };
 
 export const HISTORY_LIMIT = 200;
 
@@ -44,6 +46,8 @@ export function historyReducer(state: History, action: HistoryAction): History {
       if (!next) return state;
       return { past: [...state.past, state.present], present: next, future: rest };
     }
+    case 'reset':
+      return initHistory(action.layout);
     case 'replace':
       return { past: [...state.past, state.present].slice(-HISTORY_LIMIT), present: action.layout, future: [] };
   }

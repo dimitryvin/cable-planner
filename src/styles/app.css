@@ -269,3 +269,23 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .auto-banner summary { cursor: pointer; color: var(--muted); }
 .cable.fresh { stroke-width: 3.5; opacity: 1; filter: drop-shadow(0 0 3px var(--accent)); }
 .props-head .btn { white-space: nowrap; }
+
+/* Layouts menu */
+.layouts-menu { position: relative; }
+.layouts-trigger { display: inline-flex; align-items: center; gap: 4px; max-width: 260px; }
+.layouts-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.caret { color: var(--muted); font-size: 10px; }
+.layouts-panel {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 10; width: 340px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.16); padding: 10px;
+}
+.layouts-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.layouts-actions .btn.small { margin-top: 0; }
+.layouts-list { list-style: none; margin: 0; padding: 0; max-height: 50vh; overflow: auto; }
+.layouts-list li { display: flex; align-items: center; border-radius: 6px; }
+.layouts-list li:hover { background: var(--panel-2); }
+.layouts-list li.current { background: var(--accent-soft); }
+.layouts-open { flex: 1; display: flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 6px 8px; cursor: pointer; text-align: left; min-width: 0; }
+.layouts-row-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layouts-note { margin: 8px 2px 0; }

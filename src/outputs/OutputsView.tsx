@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { downloadText } from '../state/persistence';
 import { useLayout } from '../state/store';
 import { useUi } from '../state/ui';
@@ -34,30 +34,38 @@ function ExportButtons({ name, table, markdown }: { name: string; table?: Table;
   );
 }
 
+function readChecked(storageKey: string): Record<string, boolean> {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey) ?? '{}') as Record<string, boolean>;
+  } catch {
+    return {};
+  }
+}
+
+/** Checklist ticks per layout; reloaded when the open layout changes. */
 function useChecked(key: string) {
   const storageKey = `cable-planner:checklist:${key}`;
-  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+  const [state, setState] = useState(() => ({ storageKey, checked: readChecked(storageKey) }));
+  const checked = state.storageKey === storageKey ? state.checked : readChecked(storageKey);
+  if (state.storageKey !== storageKey) setState({ storageKey, checked });
+
+  const toggle = (id: string) => {
+    const next = { ...checked, [id]: !checked[id] };
+    setState({ storageKey, checked: next });
     try {
-      return JSON.parse(localStorage.getItem(storageKey) ?? '{}') as Record<string, boolean>;
-    } catch {
-      return {};
-    }
-  });
-  useEffect(() => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(checked));
+      localStorage.setItem(storageKey, JSON.stringify(next));
     } catch {
       /* checklist ticks are a convenience; ignore storage failures */
     }
-  }, [storageKey, checked]);
-  return [checked, (id: string) => setChecked((c) => ({ ...c, [id]: !c[id] }))] as const;
+  };
+  return [checked, toggle] as const;
 }
 
 export function OutputsView() {
-  const { layout } = useLayout();
+  const { layout, library } = useLayout();
   const { analysis, select } = useUi();
   const [tab, setTab] = useState<Tab>('shopping');
-  const [checked, toggle] = useChecked(layout.name);
+  const [checked, toggle] = useChecked(library.currentId);
 
   const shopping = shoppingList(layout, analysis);
   const parts = printParts(layout, analysis);
