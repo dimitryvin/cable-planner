@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from 're
 import { analyzeLayout, type Analysis } from '../calc/analyze';
 import type { CableCategory, Id, PortRef, Waypoint } from '../model/types';
 import type { Selection } from './actions';
+import type { Facing } from '../views/elevation/projection';
 import { useLayout } from './store';
 
 export type ViewName = 'room' | 'desk' | 'elevation' | 'outputs';
@@ -28,6 +29,8 @@ export interface UiState {
   setFocusSurfaceId: (id: Id | undefined) => void;
   deskLayer: 'top' | 'under';
   setDeskLayer: (l: 'top' | 'under') => void;
+  facing: Facing;
+  setFacing: (f: Facing) => void;
   cableMode: boolean;
   setCableMode: (on: boolean) => void;
   draft: CableDraft | null;
@@ -49,6 +52,7 @@ export function UiProvider({ children }: { children: ReactNode }) {
   const [view, setView] = useState<ViewName>('room');
   const [focus, setFocus] = useState<Id | undefined>();
   const [deskLayer, setDeskLayer] = useState<'top' | 'under'>('top');
+  const [facing, setFacing] = useState<Facing>('front');
   const [cableMode, setCableModeRaw] = useState(false);
   const [draft, setDraft] = useState<CableDraft | null>(null);
   const [filters, setFilters] = useState(ALL_ON);
@@ -68,6 +72,8 @@ export function UiProvider({ children }: { children: ReactNode }) {
       setFocusSurfaceId: setFocus,
       deskLayer,
       setDeskLayer,
+      facing,
+      setFacing,
       cableMode,
       setCableMode: (on) => {
         setCableModeRaw(on);
@@ -81,7 +87,7 @@ export function UiProvider({ children }: { children: ReactNode }) {
       autoReport,
       setAutoReport,
     }),
-    [selection, view, focusSurfaceId, deskLayer, cableMode, draft, filters, analysis, autoReport],
+    [selection, view, focusSurfaceId, deskLayer, facing, cableMode, draft, filters, analysis, autoReport],
   );
   return <UiContext.Provider value={value}>{children}</UiContext.Provider>;
 }
