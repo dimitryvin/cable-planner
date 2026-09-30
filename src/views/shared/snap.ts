@@ -121,3 +121,37 @@ export function snapOnSurface(
 }
 
 export type { Id };
+
+/** How close (beyond the item's own half-depth) a dragged floor item must get to a wall to mount on it. */
+export const WALL_GRAB = 4;
+/** How far from the wall a wall-mounted item must be dragged to drop back onto the floor. */
+export const WALL_RELEASE = 12;
+/** Height a floor item gets when it is first dragged onto a wall (typical outlet height). */
+export const WALL_MOUNT_Z = 12;
+
+type FloorOrWall = { on: 'floor'; pos: Vec2; rotation: number } | { on: 'wall'; at: { wallId: Id; offset: number; z: number }; rotation?: number };
+
+/**
+ * Where a dragged floor/wall item ends up for a pointer position: near a wall
+ * it mounts on the wall (keeping its height if it was already there), away
+ * from walls it sits on the floor.
+ */
+export function dragFloorOrWall(
+  layout: Layout,
+  start: FloorOrWall,
+  world: Vec2,
+  floorPos: Vec2,
+  halfDepth: number,
+  snap: boolean,
+): FloorOrWall {
+  const hit = snapToWall(layout, world, snap);
+  const distance = hit ? Math.hypot(world.x - (hit.wall.start.x + hit.wall.dir.x * hit.offset), world.y - (hit.wall.start.y + hit.wall.dir.y * hit.offset)) : Infinity;
+  const onWall = start.on === 'wall' ? distance <= WALL_RELEASE : distance <= halfDepth + WALL_GRAB;
+  // A turn in plan and a turn within the wall mean different things, so rotation
+  // only carries over while the item stays on the same kind of mount.
+  if (onWall && hit) {
+    const z = start.on === 'wall' ? start.at.z : WALL_MOUNT_Z;
+    return { on: 'wall', at: { wallId: hit.wall.id, offset: hit.offset, z }, rotation: start.on === 'wall' ? (start.rotation ?? 0) : 0 };
+  }
+  return { on: 'floor', pos: snapFloorPoint(layout, floorPos, halfDepth, snap), rotation: start.on === 'floor' ? start.rotation : 0 };
+}

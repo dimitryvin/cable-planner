@@ -86,7 +86,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .swatch.infra { background: var(--cable-other); }
 
 /* Properties */
-.props-head { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.props-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 6px; }
 .props-head h2 { margin: 0; }
 .ports { display: flex; flex-direction: column; gap: 3px; }
 .port-row { display: grid; grid-template-columns: 100px 1fr 10px 18px; gap: 4px; align-items: center; }
@@ -174,7 +174,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .item.brickHolder rect { fill: none; stroke: var(--warn); }
 .item.print3d rect, .item.print3d circle { stroke: var(--ok); }
 .item.selected rect, .item.selected circle { stroke: var(--accent); stroke-width: 0.9; stroke-dasharray: none; }
-.arm-link { stroke: var(--wall); stroke-width: 0.6; stroke-linecap: round; }
+.arm-link { stroke: var(--wall); stroke-width: 0.6; stroke-linecap: round; pointer-events: none; }
 .ghost { opacity: 0.25; pointer-events: none; }
 
 .cable { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; opacity: 0.85; pointer-events: none; }

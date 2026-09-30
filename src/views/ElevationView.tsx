@@ -1,6 +1,6 @@
 import { useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { roomWalls } from '../geometry/room';
-import { findOwner, infraSize, planToSurface, portsOf, resolveMount, resolveOwnerPose, resolvePort } from '../geometry/resolve';
+import { findOwner, infraSize, planToSurface, portsOf, resolveMount, resolveOwnerPose, resolvePort, wallFootprint } from '../geometry/resolve';
 import { CATEGORY_OF_PORT, SPECS } from '../model/defaults';
 import type { Device, Infra, Surface, Vec2, Vec3, WallFeature } from '../model/types';
 import { formatLength } from '../model/units';
@@ -161,8 +161,10 @@ function ElevationScene({ surface: s, proj, angle, cursor }: { surface: Surface;
   ];
 
   const renderItem = (it: (typeof items)[number]) => {
-    const size = it.kind === 'device' ? it.e.size : infraSize(it.e);
-    const pose = resolveMount(layout, it.e.mount, size);
+    const raw = it.kind === 'device' ? it.e.size : infraSize(it.e);
+    const pose = resolveMount(layout, it.e.mount, raw);
+    // A wall item turned within the wall shows its rotated outline when seen face-on.
+    const size = pose?.inWall ? { ...raw, ...wallFootprint(pose.inWall, pose.inWall.rotation) } : raw;
     if (!pose || !near(pose.pos)) return null;
     const h = proj.h(pose.pos);
     const rel = pose.rotation - angle;

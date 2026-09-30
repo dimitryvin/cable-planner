@@ -1,4 +1,4 @@
-import { duplicateEntity, getEntity, removeEntity, updateEntity, type EntityKind } from '../state/actions';
+import { canRotate, duplicateEntity, getEntity, removeEntity, rotateEntity, updateEntity, type EntityKind } from '../state/actions';
 import { useLayout } from '../state/store';
 import { useUi } from '../state/ui';
 import { useAutoConnect } from '../hooks/useAutoConnect';
@@ -42,6 +42,11 @@ export function PropertiesPanel() {
         {(kind === 'device' || (kind === 'infra' && 'kind' in entity && entity.kind === 'powerStrip')) && (
           <button className="btn small" title="Connect this item's power and data automatically" onClick={() => connectOne(id, 'name' in entity ? entity.name : 'item')}>
             Auto-connect
+          </button>
+        )}
+        {canRotate(layout, id) && (
+          <button className="btn small" title="Rotate 90° (R, Shift+R for the other way)" onClick={() => apply(rotateEntity(id, 90))}>
+            Rotate
           </button>
         )}
         {kind !== 'cable' && (

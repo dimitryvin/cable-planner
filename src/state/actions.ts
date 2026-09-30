@@ -164,3 +164,33 @@ export function duplicateEntity(layout: Layout, id: Id): { layout: Layout; newId
       return { layout };
   }
 }
+
+const norm = (deg: number) => ((Math.round(deg) % 360) + 360) % 360;
+
+/**
+ * Rotates a surface, device or piece of gear by `delta` degrees: surfaces and
+ * items on a surface or the floor turn in plan; wall-mounted items turn within
+ * the wall (e.g. a power strip from horizontal to vertical). Items on a monitor
+ * arm and wall features (outlets, windows) don't rotate.
+ */
+export function rotateEntity(id: Id, delta: number) {
+  return (l: Layout): Layout => {
+    const kind = kindOf(l, id);
+    if (kind === 'surface') return updateEntity('surface', id, (s) => ({ ...s, rotation: norm(s.rotation + delta) }))(l);
+    if (kind !== 'device' && kind !== 'infra') return l;
+    const turn = <T extends { mount: Device['mount'] }>(e: T): T => {
+      const m = e.mount;
+      if (m.on === 'arm') return e;
+      return { ...e, mount: { ...m, rotation: norm((m.rotation ?? 0) + delta) } };
+    };
+    return kind === 'device' ? updateEntity('device', id, turn)(l) : updateEntity('infra', id, (i) => turn(i) as Infra)(l);
+  };
+}
+
+export const canRotate = (l: Layout, id: Id): boolean => {
+  const kind = kindOf(l, id);
+  if (kind === 'surface') return true;
+  if (kind === 'device') return getEntity(l, 'device', id)!.mount.on !== 'arm';
+  if (kind === 'infra') return getEntity(l, 'infra', id)!.mount.on !== 'arm';
+  return false;
+};

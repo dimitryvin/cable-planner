@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { duplicateEntity, removeEntity } from '../state/actions';
+import { canRotate, duplicateEntity, removeEntity, rotateEntity } from '../state/actions';
 import { useLayout } from '../state/store';
 import { useUi } from '../state/ui';
 
@@ -46,6 +46,11 @@ export function useKeyboardShortcuts(): void {
           apply(() => r.layout);
           select({ kind: selection.kind, id: r.newId });
         }
+        return;
+      }
+      if (!mod && e.key.toLowerCase() === 'r' && selection && selection.kind !== 'room' && canRotate(layout, selection.id)) {
+        e.preventDefault();
+        apply(rotateEntity(selection.id, e.shiftKey ? -90 : 90));
         return;
       }
       if (!mod && e.key.toLowerCase() === 'c') setCableMode(!cableMode);

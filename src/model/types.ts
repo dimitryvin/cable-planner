@@ -165,7 +165,11 @@ export type Mount =
   | { on: 'surfaceTop'; surfaceId: Id; u: Inches; v: Inches; rotation: number }
   | { on: 'surfaceUnder'; surfaceId: Id; u: Inches; v: Inches; rotation: number }
   | { on: 'floor'; pos: Vec2; rotation: number }
-  | { on: 'wall'; at: WallRef }
+  /**
+   * `rotation` turns the item within the wall plane, clockwise as seen from the
+   * room (0 = lying horizontally, 90 = standing vertically).
+   */
+  | { on: 'wall'; at: WallRef; rotation?: number }
   | { on: 'arm'; armId: Id };
 
 export type MountKind = Mount['on'];

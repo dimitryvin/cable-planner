@@ -79,7 +79,16 @@ export function MountEditor({
         <>
           <SelectField label="Wall" value={mount.at.wallId} options={walls.map((w) => [w.id, w.label] as const)} onChange={(wallId) => onChange({ ...mount, at: { ...mount.at, wallId } })} />
           <LengthField label="From left corner" hint="Standing in the room facing the wall" min={0} value={mount.at.offset} onChange={(offset) => onChange({ ...mount, at: { ...mount.at, offset } })} />
-          <LengthField label="Height" min={0} value={mount.at.z} onChange={(z) => onChange({ ...mount, at: { ...mount.at, z } })} />
+          <LengthField label="Height" hint="Bottom edge, from the floor" min={0} value={mount.at.z} onChange={(z) => onChange({ ...mount, at: { ...mount.at, z } })} />
+          <SelectField
+            label="On the wall"
+            value={String(((mount.rotation ?? 0) % 180 + 180) % 180 === 90 ? 90 : 0)}
+            options={[
+              ['0', 'Horizontal'],
+              ['90', 'Vertical'],
+            ]}
+            onChange={(r) => onChange({ ...mount, rotation: Number(r) })}
+          />
         </>
       )}
       {mount.on === 'arm' && (

@@ -27,6 +27,30 @@ export interface Pose {
   rotation: number;
   /** Surface the item ultimately rides on, if any (moves with a standing desk). */
   surfaceId?: Id;
+  /** For wall-mounted items: rotation within the wall plane and the item's unrotated size. */
+  inWall?: { rotation: number; w: number; h: number };
+}
+
+const rad = (deg: number) => (deg * Math.PI) / 180;
+
+/** Width along the wall and height of a wall-mounted item after its in-wall rotation. */
+export function wallFootprint(size: { w: number; h: number }, rotation = 0): { w: number; h: number } {
+  const c = Math.abs(Math.cos(rad(rotation)));
+  const s = Math.abs(Math.sin(rad(rotation)));
+  return { w: c * size.w + s * size.h, h: s * size.w + c * size.h };
+}
+
+/**
+ * Rotates a point given in an item's local frame (x to the right as seen from
+ * the room, z up from the item's bottom) about the item's center, clockwise as
+ * seen from the room, and re-bases z on the rotated item's bottom.
+ */
+export function rotateInWall(local: { x: number; y: number; z: number }, inWall: { rotation: number; w: number; h: number }) {
+  const a = rad(inWall.rotation);
+  const dz = local.z - inWall.h / 2;
+  const x = local.x * Math.cos(a) + dz * Math.sin(a);
+  const z = -local.x * Math.sin(a) + dz * Math.cos(a);
+  return { x, y: local.y, z: z + wallFootprint(inWall, inWall.rotation).h / 2 };
 }
 
 export function surfaceHeight(s: Surface, heights?: HeightOverrides): number {
@@ -81,7 +105,8 @@ export function resolveMount(
       const wall = findWall(layout.room, mount.at.wallId);
       if (!wall) return undefined;
       const p = wallPoint(wall, mount.at.offset, size.d / 2);
-      return { pos: { ...p, z: mount.at.z }, rotation: wallFacingRotation(wall.inward) };
+      const pose: Pose = { pos: { ...p, z: mount.at.z }, rotation: wallFacingRotation(wall.inward) };
+      return mount.rotation ? { ...pose, inWall: { rotation: mount.rotation, w: size.w, h: size.h } } : pose;
     }
     case 'arm': {
       if (depth > 4) return undefined;
@@ -176,9 +201,10 @@ export function resolvePort(layout: Layout, ref: PortRef, heights?: HeightOverri
   if (!entry || !port) return undefined;
   const pose = resolveOwnerPose(layout, entry, heights);
   if (!pose) return undefined;
-  const off = rotate2(port.local, pose.rotation);
+  const local = pose.inWall ? rotateInWall(port.local, pose.inWall) : port.local;
+  const off = rotate2(local, pose.rotation);
   return {
-    point: { x: pose.pos.x + off.x, y: pose.pos.y + off.y, z: pose.pos.z + port.local.z },
+    point: { x: pose.pos.x + off.x, y: pose.pos.y + off.y, z: pose.pos.z + local.z },
     surfaceId: pose.surfaceId,
   };
 }

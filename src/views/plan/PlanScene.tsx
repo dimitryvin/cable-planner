@@ -1,5 +1,5 @@
 import { useState, type PointerEvent as ReactPointerEvent } from 'react';
-import { infraSize, planToSurface, resolveMount, resolvePort, surfaceToPlan, type OwnerEntry } from '../../geometry/resolve';
+import { infraSize, planToSurface, resolveMount, resolvePort, surfaceToPlan, wallFootprint, type OwnerEntry } from '../../geometry/resolve';
 import { CATEGORY_OF_PORT, SPECS } from '../../model/defaults';
 import type { Device, Id, Infra, Layout, Mount, Port, Size3, Surface, Vec2, WallFeature } from '../../model/types';
 import { pointOverSurface } from '../../routing/network';
@@ -8,7 +8,7 @@ import { useLayout } from '../../state/store';
 import { useUi } from '../../state/ui';
 import { useCableTool } from '../shared/cableTool';
 import { cableColor } from '../shared/Legend';
-import { snapFloorPoint, snapOnSurface, snapSurfaceCenter, snapToWall } from '../shared/snap';
+import { dragFloorOrWall, snapFloorPoint, snapOnSurface, snapSurfaceCenter, snapToWall } from '../shared/snap';
 import { useCanvas } from '../shared/SvgCanvas';
 import { useDrag } from '../shared/useDrag';
 import { FeatureShape, RoomShape, SurfaceShape } from './shapes';
@@ -73,8 +73,9 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
     const delta = { x: world.x - start.x, y: world.y - start.y };
     switch (startMount.on) {
       case 'floor': {
+        // Near a wall a floor item mounts on it; away from walls it stays on the floor.
         const p = { x: startMount.pos.x + delta.x, y: startMount.pos.y + delta.y };
-        setMount({ ...startMount, pos: snapFloorPoint(layout, p, size.d / 2, snap) });
+        setMount(dragFloorOrWall(layout, startMount, world, p, size.d / 2, snap));
         break;
       }
       case 'surfaceTop':
@@ -83,18 +84,24 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
         if (!from) break;
         const startPlan = surfaceToPlan(from, startMount.u, startMount.v);
         const plan = { x: startPlan.x + delta.x, y: startPlan.y + delta.y };
+        // Dragged off every surface, the item goes to the floor, or onto a wall if dropped near one.
+        const over = layout.surfaces.find((s) => pointOverSurface(s, world));
+        if (!over) {
+          const asFloor = { on: 'floor' as const, pos: plan, rotation: startMount.rotation };
+          setMount(dragFloorOrWall(layout, asFloor, world, plan, size.d / 2, snap));
+          break;
+        }
         // Dropping onto another surface moves the item there.
-        const target = layout.surfaces.find((s) => s.id !== from.id && pointOverSurface(s, world)) ?? from;
+        const target = over.id !== from.id ? over : from;
         const { u, v } = planToSurface(target, plan);
         const snapped = snapOnSurface(target, u, v, { w: size.w / 2, d: size.d / 2 }, grid, snap);
         setMount({ ...startMount, surfaceId: target.id, ...snapped });
         break;
       }
-      case 'wall': {
-        const hit = snapToWall(layout, world, snap);
-        if (hit) setMount({ on: 'wall', at: { ...startMount.at, wallId: hit.wall.id, offset: hit.offset } });
+      case 'wall':
+        // Slides along walls (keeping its height); pulled well away, it drops to the floor.
+        setMount(dragFloorOrWall(layout, startMount, world, world, size.d / 2, snap));
         break;
-      }
       case 'arm':
         break;
     }
@@ -189,7 +196,11 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
       m.kind === 'infra' && (m.entity.kind === 'clip' || m.entity.kind === 'spine' || m.entity.kind === 'monitorArm') ? (
         <circle r={m.entity.kind === 'clip' ? 0.9 : 1.6} />
       ) : (
-        <rect x={-size.w / 2} y={-size.d / 2} width={size.w} height={Math.max(size.d, 0.5)} rx={0.4} />
+        (() => {
+          // Wall-mounted items turned within the wall take up their rotated width along it.
+          const w = pose.inWall ? wallFootprint(pose.inWall, pose.inWall.rotation).w : size.w;
+          return <rect x={-w / 2} y={-size.d / 2} width={w} height={Math.max(size.d, 0.5)} rx={0.4} />;
+        })()
       );
     return (
       <g key={m.entity.id}>
@@ -228,8 +239,14 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
             onPointerEnter={() => setHoverPort(key)}
             onPointerLeave={() => setHoverPort(undefined)}
             onPointerDown={(e) => {
-              e.stopPropagation();
-              if (!tool.clickPort({ ownerId: owner.entity.id, portId: p.id })) select({ kind: owner.kind === 'feature' ? 'feature' : owner.kind, id: owner.entity.id });
+              if (cableMode) {
+                e.stopPropagation();
+                tool.clickPort({ ownerId: owner.entity.id, portId: p.id });
+                return;
+              }
+              // Outside cable mode the port markers are part of the item: grab it to drag.
+              if (owner.kind === 'feature') onFeatureDown(e, owner.entity);
+              else onItemDown(e, owner.kind === 'device' ? { kind: 'device', entity: owner.entity } : { kind: 'infra', entity: owner.entity });
             }}
           >
             <title>{`${owner.entity.name}: ${p.label}${used.has(p.id) ? ' (connected)' : ''}`}</title>
