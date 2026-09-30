@@ -189,12 +189,12 @@ export class Network {
         this.addEdge(id, w, 'floor', this.floorFactor(p, foot));
       }
     }
-    for (let i = 0; i < this.floorOpen.length; i++) {
-      for (let j = i + 1; j < this.floorOpen.length; j++) {
-        const a = this.nodes[this.floorOpen[i]!]!.p;
-        const b = this.nodes[this.floorOpen[j]!]!.p;
-        if (!segmentInsideRoom(this.layout, a, b)) continue;
-        this.addEdge(this.floorOpen[i]!, this.floorOpen[j]!, 'floor', this.floorFactor(a, b));
+    // Open-floor points connect to each other with L-shaped (axis-aligned) runs,
+    // the way cable is actually laid, never as diagonals.
+    const open = [...this.floorOpen];
+    for (let i = 0; i < open.length; i++) {
+      for (let j = i + 1; j < open.length; j++) {
+        this.addFloorRun(open[i]!, open[j]!);
       }
     }
 
@@ -209,10 +209,37 @@ export class Network {
     }
   }
 
+  private addFloorRun(ia: number, ib: number): void {
+    const a = this.nodes[ia]!.p;
+    const b = this.nodes[ib]!.p;
+    const aligned = Math.abs(a.x - b.x) < 0.01 || Math.abs(a.y - b.y) < 0.01;
+    if (aligned) {
+      if (segmentInsideRoom(this.layout, a, b)) this.addEdge(ia, ib, 'floor', this.floorFactor(a, b));
+      return;
+    }
+    for (const c of [{ x: a.x, y: b.y }, { x: b.x, y: a.y }]) {
+      if (!segmentInsideRoom(this.layout, a, c) || !segmentInsideRoom(this.layout, c, b)) continue;
+      const corner = this.addNode({ ...c, z: 0 }, undefined, `floorcorner:${c.x.toFixed(2)}:${c.y.toFixed(2)}`);
+      this.addEdge(ia, corner, 'floor', this.floorFactor(a, c));
+      this.addEdge(corner, ib, 'floor', this.floorFactor(c, b));
+    }
+  }
+
+  /**
+   * Cost per inch for a floor segment, blended by how much of it actually runs
+   * under a desk (sampled), so a long diagonal that merely clips a desk corner
+   * still pays the open-floor rate.
+   */
   private floorFactor(a: Vec2, b: Vec2): number {
-    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-    const underDesk = this.layout.surfaces.some((s) => pointOverSurface(s, mid));
-    return underDesk ? FLOOR_UNDER_DESK : COST.floor;
+    const steps = Math.max(1, Math.ceil(dist2(a, b) / 2));
+    let under = 0;
+    for (let i = 0; i < steps; i++) {
+      const t = (i + 0.5) / steps;
+      const p = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      if (this.layout.surfaces.some((s) => pointOverSurface(s, p))) under++;
+    }
+    const frac = under / steps;
+    return frac * FLOOR_UNDER_DESK + (1 - frac) * COST.floor;
   }
 
   private baseboardPenalty(wallId: Id, from: number, to: number): number {

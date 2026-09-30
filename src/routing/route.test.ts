@@ -48,6 +48,35 @@ describe('auto routing', () => {
     expect(lengthBy(r, 'baseboard')).toBeGreaterThan(150);
   });
 
+  describe('open floor runs are never diagonal', () => {
+    const scenario = (withHeater: boolean) => {
+      const layout = exampleLayout();
+      const features = withHeater ? layout.features : layout.features.filter((f) => f.kind !== 'obstacle' || f.obstacleType !== 'heater');
+      const outlet = makeOutlet({ on: 'wall', at: { wallId: 'w2', offset: 20, z: 12 } });
+      const nas = deviceFromPreset(preset('nas'), { on: 'floor', pos: { x: 72, y: 60 }, rotation: 0 });
+      const cable = makeCable({ ownerId: nas.id, portId: nas.ports[0]!.id }, { ownerId: outlet.id, portId: outlet.ports[0]!.id }, 'dc', 'ac');
+      const l: Layout = { ...layout, features: [...features, outlet], devices: [...layout.devices, nas], cables: [...layout.cables, cable] };
+      return routeCable(l, cable, buildNetwork(l));
+    };
+    const diagonals = (r: Route) =>
+      r.segments.filter((s) => (s.support === 'floor' || s.support === 'baseboard') && Math.abs(s.a.x - s.b.x) > 0.5 && Math.abs(s.a.y - s.b.y) > 0.5);
+
+    it('takes the short wall-hugging route when nothing is in the way', () => {
+      const r = scenario(false);
+      expect(r.ok).toBe(true);
+      expect(diagonals(r)).toEqual([]);
+      // Straight to the south wall, along the baseboard, up to the outlet: 1 + 63 + 53 + 13.
+      expect(r.segments.map((s) => s.support)).toEqual(['floor', 'floor', 'baseboard', 'wall']);
+      expect(r.length).toBeCloseTo(130.3, 0);
+    });
+
+    it('stays axis-aligned even when detouring around a heater', () => {
+      const r = scenario(true);
+      expect(r.ok).toBe(true);
+      expect(diagonals(r)).toEqual([]);
+    });
+  });
+
   it('avoids baseboard heaters when a clear path exists', () => {
     const layout = emptyLayout();
     const outlet = makeOutlet({ on: 'wall', at: { wallId: 'w0', offset: 120, z: 12 } });
