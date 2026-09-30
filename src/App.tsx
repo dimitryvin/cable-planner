@@ -2,6 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import { emptyLayout, exampleLayout } from './model/seed';
 import { deserializeLayout, downloadText, serializeLayout } from './state/persistence';
 import { useLayout } from './state/store';
+import { useUi, type ViewName } from './state/ui';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { RoomPanel } from './panels/RoomPanel';
+import { LibraryPanel } from './panels/LibraryPanel';
+import { PropertiesPanel } from './panels/PropertiesPanel';
+import { IssuesPanel } from './panels/IssuesPanel';
+import { ViewArea } from './views/ViewArea';
+
+const VIEWS: [ViewName, string][] = [
+  ['room', 'Room'],
+  ['desk', 'Desk'],
+  ['elevation', 'Elevation'],
+  ['outputs', 'Shopping & install'],
+];
 
 type Theme = 'light' | 'dark';
 
@@ -20,6 +34,9 @@ export function App() {
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [error, setError] = useState<string>();
   const fileInput = useRef<HTMLInputElement>(null);
+  const [leftTab, setLeftTab] = useState<'room' | 'library'>('room');
+  const { view, setView, cableMode, setCableMode, select } = useUi();
+  useKeyboardShortcuts();
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -80,16 +97,39 @@ export function App() {
       {error && <div className="error-banner" onClick={() => setError(undefined)}>{error}</div>}
       <div className="main">
         <aside className="pane left">
-          <div className="section">
-            <h2>Layout</h2>
-            <div>{layout.name}</div>
-            <div className="muted">
-              {layout.surfaces.length} surfaces · {layout.devices.length} devices · {layout.cables.length} cables
-            </div>
+          <div className="tabs">
+            <button className={leftTab === 'room' ? 'on' : ''} onClick={() => setLeftTab('room')}>Room</button>
+            <button className={leftTab === 'library' ? 'on' : ''} onClick={() => setLeftTab('library')}>Devices & gear</button>
           </div>
+          {leftTab === 'room' ? <RoomPanel /> : <LibraryPanel />}
         </aside>
-        <main className="center" />
-        <aside className="pane right" />
+        <main className="center">
+          <div className="view-tabs">
+            {VIEWS.map(([v, label]) => (
+              <button key={v} className={view === v ? 'on' : ''} onClick={() => setView(v)}>
+                {label}
+              </button>
+            ))}
+            <div className="spacer" />
+            {view !== 'outputs' && (
+              <button
+                className={`btn ${cableMode ? 'active' : ''}`}
+                title="Click a port, then another port. Click empty space or a clip/grommet in between to pin waypoints. (C)"
+                onClick={() => {
+                  setCableMode(!cableMode);
+                  select(null);
+                }}
+              >
+                {cableMode ? 'Drawing cable… (Esc)' : 'Draw cable'}
+              </button>
+            )}
+          </div>
+          <ViewArea />
+        </main>
+        <aside className="pane right">
+          <PropertiesPanel />
+          <IssuesPanel />
+        </aside>
       </div>
     </div>
   );
