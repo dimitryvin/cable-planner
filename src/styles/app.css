@@ -113,3 +113,72 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .pill.error { background: var(--danger); }
 .pill.warn { background: var(--warn); }
 .pill.info { background: var(--accent); }
+
+/* Canvas */
+.canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; user-select: none; }
+.canvas:active { cursor: grabbing; }
+.fit-btn { position: absolute; top: 10px; right: 10px; }
+.legend {
+  position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 2px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 4px;
+}
+.legend button { display: flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 3px 7px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+.legend button:hover { background: var(--panel-2); }
+.legend button.off { opacity: 0.35; text-decoration: line-through; }
+.legend .line { width: 14px; height: 3px; border-radius: 2px; }
+.hint {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: white; padding: 5px 12px; border-radius: 16px; font-size: 12px; pointer-events: none;
+}
+
+.room .floor { fill: var(--room-floor); }
+.room .walls { fill: none; stroke: var(--wall); stroke-linejoin: miter; }
+.wall-label { fill: var(--muted); font-family: var(--font); }
+.item-label { fill: var(--text); font-family: var(--font); pointer-events: none; opacity: 0.85; }
+
+.feature { cursor: move; }
+.feature.outlet rect { fill: var(--cable-power); stroke: var(--panel); stroke-width: 0.3; }
+.feature.ethernetJack rect { fill: var(--cable-network); stroke: var(--panel); stroke-width: 0.3; }
+.feature.window rect { fill: #9cc7ef; stroke: #4f86c6; stroke-width: 0.4; }
+.feature.heater rect { fill: #f3b36b; stroke: #c9731b; stroke-width: 0.4; }
+.feature.door rect { fill: var(--room-floor); stroke: var(--wall); stroke-width: 0.4; }
+.feature.other rect { fill: var(--muted); }
+.door-swing { fill: none; stroke: var(--muted); stroke-width: 0.3; stroke-dasharray: 1.5 1; }
+.feature.selected rect { stroke: var(--accent); stroke-width: 1; }
+
+.surface { cursor: move; }
+.surface .top { fill: var(--surface-fill); stroke: var(--surface-stroke); stroke-width: 0.5; }
+.surface.selected .top { stroke: var(--accent); stroke-width: 1.2; }
+.surface.dim { opacity: 0.35; }
+.surface .grommet { fill: var(--panel-2); stroke: var(--surface-stroke); stroke-width: 0.4; }
+.surface .beam { fill: none; stroke: var(--surface-stroke); stroke-width: 0.4; stroke-dasharray: 1.5 1; }
+.surface .drawer { fill: none; stroke: var(--surface-stroke); stroke-width: 0.3; stroke-dasharray: 0.6 0.8; }
+.grommet-target { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 0.4; cursor: copy; opacity: 0.8; }
+
+.item { cursor: move; }
+.item rect, .item circle { fill: var(--panel); stroke: var(--text); stroke-width: 0.35; }
+.item.device rect { fill: var(--accent-soft); stroke: var(--accent); }
+.item.under rect, .item.under circle { stroke-dasharray: 1 0.6; fill-opacity: 0.6; }
+.item.tray rect { fill: none; stroke: var(--muted); stroke-dasharray: 1.2 0.8; }
+.item.powerStrip rect { fill: var(--panel-2); stroke: var(--cable-power); }
+.item.clip circle { fill: var(--cable-other); stroke: none; }
+.item.spine circle { fill: var(--panel-2); stroke: var(--cable-other); stroke-width: 0.6; }
+.item.monitorArm circle { fill: var(--wall); stroke: none; }
+.item.brickHolder rect { fill: none; stroke: var(--warn); }
+.item.print3d rect, .item.print3d circle { stroke: var(--ok); }
+.item.selected rect, .item.selected circle { stroke: var(--accent); stroke-width: 0.9; stroke-dasharray: none; }
+.arm-link { stroke: var(--wall); stroke-width: 0.6; stroke-linecap: round; }
+.ghost { opacity: 0.25; pointer-events: none; }
+
+.cable { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; opacity: 0.85; pointer-events: none; }
+.cable.manual { stroke-dasharray: 6 3; }
+.cable.selected { stroke-width: 4; opacity: 1; }
+.cable-hit { fill: none; stroke: transparent; stroke-width: 12; vector-effect: non-scaling-stroke; cursor: pointer; }
+.waypoint { fill: var(--panel); stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.draft { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
+
+.port { stroke: var(--panel); stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: crosshair; }
+.port.used { stroke: var(--text); }
+.port.start { stroke: var(--accent); stroke-width: 3; }
+.port-label { fill: var(--text); font-family: var(--font); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; vector-effect: non-scaling-stroke; pointer-events: none; }
+.cable-mode .canvas { cursor: crosshair; }
