@@ -1,0 +1,25 @@
+.dockerignore
+  s_6e6971b8198af2::t_74db5986685f84 7-9
+Dockerfile
+  s_6e6971b8198af2::t_e8fbc86da924ba 12-13
+compose.yaml
+  s_6e6971b8198af2::t_c0b5851a2a9f47 17-23
+docker/nginx.conf
+  s_6e6971b8198af2::t_405ce112021055 10,27-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5d5910decac07180f0cd30e504f243397286cfa2",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
