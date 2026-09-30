@@ -1,0 +1,43 @@
+src/views/shared/SvgCanvas.tsx
+  s_6e6971b8198af2::t_b5fef634b9e09a 1-148
+src/views/shared/cableTool.ts
+  s_6e6971b8198af2::t_b5fef634b9e09a 1-45
+src/views/shared/Legend.tsx
+  s_6e6971b8198af2::t_b5fef634b9e09a 1-27
+tsconfig.tsbuildinfo
+  s_6e6971b8198af2::t_2f41f74960b047 1
+src/views/shared/snap.ts
+  s_6e6971b8198af2::t_5248e666e986d7 1-123
+src/views/plan/shapes.tsx
+  s_6e6971b8198af2::t_e799be38d8e900 1-48,57-86
+  s_6e6971b8198af2::t_ef87d83b15133c 49-56
+src/views/plan/PlanScene.tsx
+  s_6e6971b8198af2::t_2f41f74960b047 2,47,310,315-331,333,335-336,338,340-341
+  s_6e6971b8198af2::t_a76df59ef47fb5 1,3-46,48-309,311-314,332,334,337,339,342-345
+src/views/RoomView.tsx
+  s_6e6971b8198af2::t_2f41f74960b047 1-44
+src/views/ViewArea.tsx
+  s_6e6971b8198af2::t_2f41f74960b047 2-3,6-18
+src/views/shared/snap.test.ts
+  s_6e6971b8198af2::t_5248e666e986d7 1-47
+src/styles/app.css
+  s_6e6971b8198af2::t_dcd3f49ba01cfe 116-184
+src/views/shared/useDrag.ts
+  s_6e6971b8198af2::t_b5fef634b9e09a 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "03f384b7a36d98f1b8d3aaba737e95514a813882",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
