@@ -1,0 +1,33 @@
+src/panels/props/MountEditor.tsx
+  s_6e6971b8198af2::t_2dca33e866c36f 21,27-28,86,96
+src/views/shared/snap.ts
+  s_6e6971b8198af2::t_2dca33e866c36f 2-3,125-129,152,161-204
+src/state/rotate.test.ts
+  s_6e6971b8198af2::t_086596c1b39829 5,78-135
+src/state/actions.ts
+  s_6e6971b8198af2::t_2dca33e866c36f 181,195-199
+src/views/plan/PlanScene.tsx
+  s_6e6971b8198af2::t_086596c1b39829 2
+  s_6e6971b8198af2::t_2dca33e866c36f 10,85
+  s_6e6971b8198af2::t_0648cccde07220 284-293
+src/panels/props/DeviceProps.tsx
+  s_6e6971b8198af2::t_2dca33e866c36f 83
+src/views/shared/useDrag.ts
+  s_6e6971b8198af2::t_87df35c3565c6d 25-27,29,34-38,42-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "edda06705749939dfb672519b60a8db3b7ca6f55",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
