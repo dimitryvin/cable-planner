@@ -1,0 +1,57 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f6f4;
+  --panel: #ffffff;
+  --panel-2: #f0f0ed;
+  --border: #dddcd7;
+  --text: #1d1d1b;
+  --muted: #6b6a65;
+  --accent: #2f6fdb;
+  --accent-soft: #e3ecfb;
+  --danger: #c93b32;
+  --warn: #b7791f;
+  --ok: #2f855a;
+  --wall: #3a3a37;
+  --room-floor: #fbfbf9;
+  --surface-fill: #e8dcc6;
+  --surface-stroke: #9c8866;
+  --grid: #ecebe6;
+
+  --cable-power: #d64545;
+  --cable-video: #7c4ddb;
+  --cable-usb: #2f80c9;
+  --cable-network: #2f9e6e;
+  --cable-audio: #d98a1c;
+  --cable-other: #7a7a74;
+
+  --radius: 8px;
+  --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #151514;
+  --panel: #1e1e1c;
+  --panel-2: #262624;
+  --border: #353532;
+  --text: #ecebe6;
+  --muted: #9a998f;
+  --accent: #6a9cf0;
+  --accent-soft: #22324f;
+  --danger: #ef6b61;
+  --warn: #e3a84a;
+  --ok: #58b686;
+  --wall: #cfcdc4;
+  --room-floor: #1a1a19;
+  --surface-fill: #3d3527;
+  --surface-stroke: #a08a62;
+  --grid: #232321;
+
+  --cable-power: #ef6b6b;
+  --cable-video: #a585f0;
+  --cable-usb: #5ea8ea;
+  --cable-network: #56c393;
+  --cable-audio: #f0a94a;
+  --cable-other: #a3a39a;
+}
