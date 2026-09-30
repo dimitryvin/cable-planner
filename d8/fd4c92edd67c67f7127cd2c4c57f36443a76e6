@@ -1,0 +1,23 @@
+src/calc/autoConnect.ts
+  s_6e6971b8198af2::t_a1fe589da6abd7 152-153,165-166,279-282,307
+src/calc/autoConnect.test.ts
+  s_6e6971b8198af2::t_7caa13d96f038b 3,112-143
+.vitest/json/output.json
+  s_6e6971b8198af2::t_ee0bd075d39fbc 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d8fd4c92edd67c67f7127cd2c4c57f36443a76e6",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
