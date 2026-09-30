@@ -149,7 +149,8 @@ function blockedPorts(layout: Layout): Set<string> {
   return blocked;
 }
 
-function connectPower(ctx: Ctx, owner: Device | Strip, watts: number): void {
+function connectPower(ctx: Ctx, owner: Device | Strip, deviceWatts: number): void {
+  let watts = deviceWatts;
   const isStrip = 'kind' in owner && owner.kind === 'powerStrip';
   const myPort = isStrip ? owner.ports[0] : owner.ports.find((p) => p.type === 'ac' || p.type === 'dc');
   if (!myPort) return;
@@ -161,6 +162,8 @@ function connectPower(ctx: Ctx, owner: Device | Strip, watts: number): void {
 
   const blocked = blockedPorts(ctx.layout);
   const budget = new Map(powerBudget(ctx.layout).sources.map((s) => [s.id, s]));
+  // A strip brings along everything already plugged into it.
+  if (isStrip) watts = budget.get(owner.id)?.totalWatts ?? 0;
   const brickBlocks = !isStrip && (owner as Device).brick?.style === 'wallWart' && (owner as Device).brick!.blocksAdjacent;
   const mySurface = resolvePort(ctx.layout, myRef)?.surfaceId;
   // Strips only plug into wall outlets (never daisy-chained).
@@ -273,8 +276,10 @@ function connectLink(ctx: Ctx, d: Device, need: Extract<Need, { kind: 'link' }>)
         if (used.has(key({ ownerId: peer.id, portId: b.id }))) continue;
         const pb = pointOf(ctx.layout, { ownerId: peer.id, portId: b.id });
         if (!pb) continue;
-        const labelFit = INPUT_LABEL.test(b.label) === wantsHost ? 0 : 1;
-        const score: [number, number, number, number] = [need.targets.indexOf(peer.role), typeRank(a.type, b.type), labelFit, dist3(pa, pb)];
+        // Host/input ports are reserved for the laptop or computer that drives the dock; everything
+        // else avoids them even if that means a less exact connector match.
+        const hostFit = INPUT_LABEL.test(b.label) === wantsHost ? 0 : 1;
+        const score: [number, number, number, number] = [need.targets.indexOf(peer.role), hostFit, typeRank(a.type, b.type), dist3(pa, pb)];
         if (!best || lessThan(score, best.score)) best = { a, peer, b, score };
       }
     }
@@ -299,7 +304,7 @@ export function autoConnect(layout: Layout, ids: readonly Id[]): AutoConnectResu
   const wanted = new Set(ids);
   const hasLaptop = layout.devices.some((d) => roleOf(layout, d) === 'laptop');
 
-  // Strips first so devices can plug into them, then devices in dependency order.
+  // Strips first so devices can plug into them (their load is read from the layout).
   for (const s of layout.infra) {
     if (s.kind === 'powerStrip' && wanted.has(s.id)) connectPower(ctx, s, 0);
   }

@@ -1,6 +1,6 @@
 import { findPort } from '../geometry/resolve';
 import { exampleLayout, emptyLayout } from '../model/seed';
-import { deviceFromPreset, makeOutlet } from '../model/factories';
+import { deviceFromPreset, makeOutlet, makePowerStrip } from '../model/factories';
 import { BUILT_IN_PRESETS } from '../model/defaults';
 import type { Cable, Layout } from '../model/types';
 import { allConnectable, autoConnect } from './autoConnect';
@@ -108,5 +108,37 @@ describe('autoConnect', () => {
     expect(power).toHaveLength(1);
     expect(r.unresolved.some((u) => /WAN\): no Ethernet jack/.test(u.message))).toBe(true);
     expect(powerBudget(r.layout).issues.map((i) => i.code)).not.toContain('power.brick-blocks');
+  });
+
+  it('counts a strip\'s existing load before plugging it into an outlet', () => {
+    const room = emptyLayout();
+    const outlet = makeOutlet({ on: 'wall', at: { wallId: 'w0', offset: 20, z: 12 } });
+    const heater = { ...deviceFromPreset(preset('desk-lamp'), { on: 'floor', pos: { x: 20, y: 5 }, rotation: 0 }), name: 'Space heater', watts: 200 };
+    const strip = makePowerStrip({ on: 'floor', pos: { x: 120, y: 100 }, rotation: 0 });
+    const towers = [1, 2, 3, 4].map((n) => ({ ...deviceFromPreset(preset('tower'), { on: 'floor', pos: { x: 110 + n, y: 100 }, rotation: 0 }), name: `Tower ${n}` }));
+    let l: Layout = { ...room, features: [outlet], infra: [strip], devices: [heater, ...towers] };
+    l = autoConnect(l, [heater.id]).layout;
+    for (const t of towers) l = autoConnect(l, [t.id]).layout;
+    const r = autoConnect(l, allConnectable(l));
+    expect(powerBudget(r.layout).issues.map((i) => i.code)).not.toContain('power.over');
+    expect(r.unresolved.some((u) => u.ownerId === strip.id && /overloaded/.test(u.message))).toBe(true);
+  });
+
+  it('keeps the dock\'s Host port free for the laptop when items are connected one at a time', () => {
+    const withGear: Layout = {
+      ...bare,
+      devices: [
+        ...bare.devices,
+        deviceFromPreset(preset('mic-arm'), { on: 'floor', pos: { x: 60, y: 20 }, rotation: 0 }),
+        deviceFromPreset(preset('webcam'), { on: 'floor', pos: { x: 62, y: 20 }, rotation: 0 }),
+      ],
+    };
+    const id = (name: string) => withGear.devices.find((d) => d.name.startsWith(name))!.id;
+    let cur = withGear;
+    for (const name of ['Mic', 'Webcam', 'Laptop']) cur = autoConnect(cur, [id(name)]).layout;
+    const laptop = byName(cur, 'Laptop');
+    const dock = byName(cur, 'Thunderbolt dock');
+    const link = cablesOf(cur, laptop.id).find((c) => other(c, laptop.id).ownerId === dock.id);
+    expect(link && findPort(cur, other(link, laptop.id))!.port.label).toBe('Host');
   });
 });
