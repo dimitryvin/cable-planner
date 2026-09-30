@@ -233,3 +233,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .meter .fill.warn { background: var(--warn); }
 .meter .fill.error { background: var(--danger); }
 .print-only { display: none; }
+.preset .icon-btn { opacity: 0; }
+.preset:hover .icon-btn { opacity: 1; }
+.preset-editor { border: 1px solid var(--accent); border-radius: 8px; padding: 8px; margin: 8px 0; background: var(--panel-2); }
+.preset-editor .btn.primary { margin-top: 8px; }
+.onboarding {
+  position: absolute; top: 60px; left: 50%; transform: translateX(-50%); max-width: 460px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; box-shadow: 0 6px 24px rgb(0 0 0 / 0.12); pointer-events: none; opacity: 0.96;
+}
+.onboarding h3 { margin: 0 0 6px; font-size: 14px; }
+.onboarding ol { margin: 0; padding-left: 18px; }
+.onboarding li { margin: 3px 0; }
