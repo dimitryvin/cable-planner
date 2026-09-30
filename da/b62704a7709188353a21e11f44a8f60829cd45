@@ -1,0 +1,25 @@
+src/routing/network.ts
+  s_6e6971b8198af2::t_66909cb4e2810a 192-197,212-224
+  s_6e6971b8198af2::t_cca32cfba83bd8 225,228-232,234-242
+  s_6e6971b8198af2::t_9c049d11aba8a2 226-227
+src/routing/route.test.ts
+  s_6e6971b8198af2::t_66909cb4e2810a 51-67,71-77
+  s_6e6971b8198af2::t_7b6dafb22a93d1 68-70
+  s_6e6971b8198af2::t_67c85a99665a0b 78-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "dab62704a7709188353a21e11f44a8f60829cd45",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
