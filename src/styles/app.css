@@ -188,3 +188,15 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .empty { padding: 32px; color: var(--muted); }
 .layer-under .surface .top { fill-opacity: 0.35; }
 .cable.faint { opacity: 0.18; }
+.elev-wall { fill: var(--room-floor); }
+.elev-floor { stroke: var(--wall); stroke-width: 1.5; }
+.surface.elev .top { fill: var(--surface-fill); stroke: var(--surface-stroke); stroke-width: 0.3; cursor: ns-resize; }
+.surface.elev.selected .top { stroke: var(--accent); stroke-width: 0.6; }
+.surface.elev .leg { fill: var(--panel-2); stroke: var(--surface-stroke); stroke-width: 0.3; }
+.beam-elev { fill: var(--surface-stroke); opacity: 0.5; }
+.drawer-elev { fill: var(--panel-2); stroke: var(--surface-stroke); stroke-width: 0.3; }
+.grommet-elev { fill: var(--panel); stroke: none; }
+.standing-range line { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.standing-range text, .dim-label { fill: var(--muted); font-family: var(--font); }
+.elevation .item.device rect { cursor: ns-resize; }
+.elev-floor { vector-effect: non-scaling-stroke; stroke-width: 3; }
