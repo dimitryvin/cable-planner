@@ -1,0 +1,55 @@
+src/views/ViewArea.tsx
+  s_6e6971b8198af2::t_10c4fc64292f52 6,15
+src/state/persistence.test.ts
+  s_6e6971b8198af2::t_b9b57d0625d198 40-56
+src/panels/props/DeviceProps.tsx
+  s_6e6971b8198af2::t_eb74b6a0a8531c 62,110-115
+src/outputs/printParts.ts
+  s_6e6971b8198af2::t_eb74b6a0a8531c 30-31,36-37,112,114
+  s_6e6971b8198af2::t_c731f56e1a40fe 1-29,32-35,38-111,113,115-147
+tsconfig.tsbuildinfo
+  s_6e6971b8198af2::t_10c4fc64292f52 1
+src/outputs/wiring.ts
+  s_6e6971b8198af2::t_c731f56e1a40fe 1-71
+src/styles/app.css
+  s_6e6971b8198af2::t_10c4fc64292f52 203-235
+src/outputs/OutputsView.tsx
+  s_6e6971b8198af2::t_10c4fc64292f52 1-203
+src/outputs/format.ts
+  s_6e6971b8198af2::t_51fbb6ff28083c 1-24
+src/outputs/checklist.ts
+  s_6e6971b8198af2::t_b12d93dab98bf1 32,38
+  s_6e6971b8198af2::t_c731f56e1a40fe 1-31,33-37,39-95
+src/model/seed.ts
+  s_6e6971b8198af2::t_eb74b6a0a8531c 133,161
+src/main.tsx
+  s_6e6971b8198af2::t_10c4fc64292f52 8
+src/model/types.ts
+  s_6e6971b8198af2::t_eb74b6a0a8531c 248-253
+src/outputs/shopping.ts
+  s_6e6971b8198af2::t_51fbb6ff28083c 1-133
+src/styles/print.css
+  s_6e6971b8198af2::t_10c4fc64292f52 1-14
+src/outputs/outputs.test.ts
+  s_6e6971b8198af2::t_b12d93dab98bf1 1-60
+src/model/migrate.ts
+  s_6e6971b8198af2::t_b9b57d0625d198 7-19,53
+src/calc/warnings.ts
+  s_6e6971b8198af2::t_eb74b6a0a8531c 10,80,99,109,117,128,145,180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0cd2b469058ea0119f174cb291960258b519688e",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
