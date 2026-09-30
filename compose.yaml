@@ -14,3 +14,10 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    mem_limit: 64m
+    pids_limit: 100
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
