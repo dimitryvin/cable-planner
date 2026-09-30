@@ -44,7 +44,7 @@ export function clipsNeeded(route: Route, settings: Settings): number {
   return unsupportedSpans(route).reduce((n, s) => n + Math.floor(s.length / Math.max(1, settings.clipSpacing)), 0);
 }
 
-const COMPATIBLE: readonly (readonly PortType[])[] = [
+export const COMPATIBLE: readonly (readonly PortType[])[] = [
   ['usb-c', 'usb-a', 'thunderbolt'],
   ['hdmi', 'dp', 'usb-c', 'thunderbolt'],
   ['ac', 'dc'],

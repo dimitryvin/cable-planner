@@ -1,6 +1,7 @@
 import { useUi } from '../state/ui';
 import { useLayout } from '../state/store';
 import { Legend } from './shared/Legend';
+import { AutoConnectBanner } from './shared/AutoConnectBanner';
 import { RoomView } from './RoomView';
 import { DeskView } from './DeskView';
 import { ElevationView } from './ElevationView';
@@ -17,6 +18,7 @@ export function ViewArea() {
       {view === 'elevation' && <ElevationView />}
       {view === 'outputs' && <OutputsView />}
       {view !== 'outputs' && <Legend />}
+      {view !== 'outputs' && <AutoConnectBanner />}
       {empty && view === 'room' && (
         <div className="onboarding">
           <h3>Plan your cables in five steps</h3>

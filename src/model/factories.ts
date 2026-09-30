@@ -22,6 +22,7 @@ export function deviceFromPreset(preset: DevicePreset, mount: Mount, name = pres
     id: newId('dev'),
     name,
     presetId: preset.id,
+    role: preset.role,
     size: { ...preset.size },
     mount,
     watts: preset.watts,

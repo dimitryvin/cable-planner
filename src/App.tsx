@@ -9,6 +9,7 @@ import { LibraryPanel } from './panels/LibraryPanel';
 import { PropertiesPanel } from './panels/PropertiesPanel';
 import { IssuesPanel } from './panels/IssuesPanel';
 import { ViewArea } from './views/ViewArea';
+import { useAutoConnect } from './hooks/useAutoConnect';
 
 const VIEWS: [ViewName, string][] = [
   ['room', 'Room'],
@@ -37,6 +38,7 @@ export function App() {
   const [leftTab, setLeftTab] = useState<'room' | 'library'>('room');
   const { view, setView, cableMode, setCableMode, select } = useUi();
   useKeyboardShortcuts();
+  const { connectAll } = useAutoConnect();
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -111,6 +113,11 @@ export function App() {
               </button>
             ))}
             <div className="spacer" />
+            {view !== 'outputs' && (
+              <button className="btn" title="Connect power, video, data and network for every device and power strip" onClick={connectAll}>
+                Auto-connect all
+              </button>
+            )}
             {view !== 'outputs' && (
               <button
                 className={`btn ${cableMode ? 'active' : ''}`}

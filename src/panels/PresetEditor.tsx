@@ -1,5 +1,6 @@
 import { PORT_LABELS } from '../model/defaults';
-import type { DevicePreset, MountKind, PortType } from '../model/types';
+import type { DevicePreset, DeviceRole, MountKind, PortType } from '../model/types';
+import { ROLE_LABELS } from '../calc/roles';
 import { LengthField, NumberField, SelectField, TextField } from './fields';
 
 const MOUNTS: [MountKind, string][] = [
@@ -27,6 +28,7 @@ export function PresetEditor({ preset, onChange, onDone }: { preset: DevicePrese
       <LengthField label="Depth" min={0.1} value={preset.size.d} onChange={(d) => set({ size: { ...preset.size, d } })} />
       <LengthField label="Height" min={0.1} value={preset.size.h} onChange={(h) => set({ size: { ...preset.size, h } })} />
       <NumberField label="Power draw" unit="W" min={0} value={preset.watts} onChange={(watts) => set({ watts })} />
+      <SelectField<DeviceRole> label="Type" value={preset.role ?? 'other'} options={Object.entries(ROLE_LABELS) as [DeviceRole, string][]} onChange={(role) => set({ role })} />
       <SelectField label="Default placement" value={preset.defaultMount} options={MOUNTS} onChange={(defaultMount) => set({ defaultMount })} />
       <div className="ports">
         {preset.ports.map((p, i) => (

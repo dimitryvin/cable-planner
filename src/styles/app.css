@@ -244,3 +244,21 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .onboarding h3 { margin: 0 0 6px; font-size: 14px; }
 .onboarding ol { margin: 0; padding-left: 18px; }
 .onboarding li { margin: 3px 0; }
+
+/* Auto-connect */
+.auto-banner {
+  position: absolute; top: 52px; right: 10px; width: 340px; max-height: 60%; overflow: auto;
+  background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--ok);
+  border-radius: 8px; padding: 10px 12px; box-shadow: 0 6px 24px rgb(0 0 0 / 0.12); font-size: 12px; z-index: 2;
+}
+.auto-banner.partial { border-left-color: var(--warn); }
+.auto-head { display: flex; gap: 4px; align-items: baseline; }
+.auto-head .icon-btn { margin-left: auto; }
+.auto-list { margin: 6px 0 0; padding-left: 16px; }
+.auto-list li { cursor: pointer; padding: 1px 0; }
+.auto-list li:hover { color: var(--accent); }
+.auto-list.unresolved li::marker { color: var(--warn); }
+.auto-banner details { margin-top: 6px; }
+.auto-banner summary { cursor: pointer; color: var(--muted); }
+.cable.fresh { stroke-width: 3.5; opacity: 1; filter: drop-shadow(0 0 3px var(--accent)); }
+.props-head .btn { white-space: nowrap; }

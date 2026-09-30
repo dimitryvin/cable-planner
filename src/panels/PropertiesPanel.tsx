@@ -1,6 +1,7 @@
 import { duplicateEntity, getEntity, removeEntity, updateEntity, type EntityKind } from '../state/actions';
 import { useLayout } from '../state/store';
 import { useUi } from '../state/ui';
+import { useAutoConnect } from '../hooks/useAutoConnect';
 import { CableProps } from './props/CableProps';
 import { DeviceProps, InfraProps } from './props/DeviceProps';
 import { FeatureProps } from './props/FeatureProps';
@@ -18,6 +19,7 @@ const TITLES: Record<EntityKind, string> = {
 export function PropertiesPanel() {
   const { layout, apply } = useLayout();
   const { selection, select } = useUi();
+  const { connectOne } = useAutoConnect();
   const kind = selection && selection.kind !== 'room' ? selection.kind : undefined;
   const entity = kind && selection ? getEntity(layout, kind, selection.id) : undefined;
 
@@ -37,6 +39,11 @@ export function PropertiesPanel() {
       <div className="props-head">
         <h2>{TITLES[kind]}</h2>
         <div className="spacer" />
+        {(kind === 'device' || (kind === 'infra' && 'kind' in entity && entity.kind === 'powerStrip')) && (
+          <button className="btn small" title="Connect this item's power and data automatically" onClick={() => connectOne(id, 'name' in entity ? entity.name : 'item')}>
+            Auto-connect
+          </button>
+        )}
         {kind !== 'cable' && (
           <button
             className="btn small"

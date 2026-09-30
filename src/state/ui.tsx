@@ -11,6 +11,13 @@ export interface CableDraft {
   waypoints: Waypoint[];
 }
 
+export interface AutoConnectReport {
+  added: Id[];
+  connected: string[];
+  unresolved: { ownerId: Id; message: string }[];
+  scope: string;
+}
+
 export interface UiState {
   selection: Selection | null;
   select: (s: Selection | null) => void;
@@ -28,6 +35,8 @@ export interface UiState {
   filters: Record<CableCategory, boolean>;
   toggleFilter: (c: CableCategory) => void;
   analysis: Analysis;
+  autoReport: AutoConnectReport | null;
+  setAutoReport: (r: AutoConnectReport | null) => void;
 }
 
 const UiContext = createContext<UiState | null>(null);
@@ -43,6 +52,7 @@ export function UiProvider({ children }: { children: ReactNode }) {
   const [cableMode, setCableModeRaw] = useState(false);
   const [draft, setDraft] = useState<CableDraft | null>(null);
   const [filters, setFilters] = useState(ALL_ON);
+  const [autoReport, setAutoReport] = useState<AutoConnectReport | null>(null);
 
   // Routing + calculations for the whole layout (~ms); recomputed only when the layout changes.
   const analysis = useMemo(() => analyzeLayout(layout), [layout]);
@@ -68,8 +78,10 @@ export function UiProvider({ children }: { children: ReactNode }) {
       filters,
       toggleFilter: (c) => setFilters((f) => ({ ...f, [c]: !f[c] })),
       analysis,
+      autoReport,
+      setAutoReport,
     }),
-    [selection, view, focusSurfaceId, deskLayer, cableMode, draft, filters, analysis],
+    [selection, view, focusSurfaceId, deskLayer, cableMode, draft, filters, analysis, autoReport],
   );
   return <UiContext.Provider value={value}>{children}</UiContext.Provider>;
 }

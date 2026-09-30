@@ -2,12 +2,14 @@ import { newId } from '../../model/ids';
 import type { Device, DevicePreset, Infra } from '../../model/types';
 import { infraSize } from '../../geometry/resolve';
 import { useLayout } from '../../state/store';
+import { ROLE_LABELS, roleOf } from '../../calc/roles';
+import type { DeviceRole } from '../../model/types';
 import { CheckField, LengthField, NumberField, SelectField, TextField } from '../fields';
 import { MountEditor } from './MountEditor';
 import { PortsEditor } from './PortsEditor';
 
 export function DeviceProps({ d, update }: { d: Device; update: (fn: (d: Device) => Device) => void }) {
-  const { apply } = useLayout();
+  const { layout, apply } = useLayout();
   const set = (patch: Partial<Device>) => update((x) => ({ ...x, ...patch }));
   const saveAsPreset = () => {
     const preset: DevicePreset = {
@@ -18,6 +20,7 @@ export function DeviceProps({ d, update }: { d: Device; update: (fn: (d: Device)
       brick: d.brick,
       ports: d.ports.map(({ id: _id, ...rest }) => rest),
       defaultMount: d.mount.on,
+      role: roleOf(layout, d),
       builtIn: false,
     };
     apply((l) => ({ ...l, customPresets: [...l.customPresets, preset] }));
@@ -26,6 +29,12 @@ export function DeviceProps({ d, update }: { d: Device; update: (fn: (d: Device)
   return (
     <>
       <TextField label="Name" value={d.name} onChange={(name) => set({ name })} />
+      <SelectField<DeviceRole>
+        label="Type"
+        value={roleOf(layout, d)}
+        options={Object.entries(ROLE_LABELS) as [DeviceRole, string][]}
+        onChange={(role) => set({ role })}
+      />
       <LengthField label="Width" min={0.1} value={d.size.w} onChange={(w) => set({ size: { ...d.size, w } })} />
       <LengthField label="Depth" min={0.1} value={d.size.d} onChange={(dd) => set({ size: { ...d.size, d: dd } })} />
       <LengthField label="Height" min={0.1} value={d.size.h} onChange={(h) => set({ size: { ...d.size, h } })} />

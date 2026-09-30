@@ -112,6 +112,7 @@ const preset = (p: Omit<DevicePreset, 'builtIn'>): DevicePreset => ({ ...p, buil
 export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   preset({
     id: 'monitor-27',
+    role: 'display',
     name: '27" monitor',
     size: { w: 24.1, d: 2, h: 14.3 },
     watts: 35,
@@ -120,6 +121,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'monitor-32',
+    role: 'display',
     name: '32" monitor',
     size: { w: 28.5, d: 2, h: 16.8 },
     watts: 45,
@@ -128,6 +130,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'monitor-34uw',
+    role: 'display',
     name: '34" ultrawide',
     size: { w: 31.9, d: 3.5, h: 14.4 },
     watts: 60,
@@ -136,6 +139,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'laptop',
+    role: 'laptop',
     name: 'Laptop',
     size: { w: 12.3, d: 8.7, h: 0.7 },
     watts: 0,
@@ -147,6 +151,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'tower',
+    role: 'computer',
     name: 'Desktop tower',
     size: { w: 8.5, d: 18, h: 18 },
     watts: 350,
@@ -163,6 +168,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'mac-mini',
+    role: 'computer',
     name: 'Mac mini',
     size: { w: 5, d: 5, h: 2 },
     watts: 65,
@@ -177,6 +183,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'tb-dock',
+    role: 'dock',
     name: 'Thunderbolt dock',
     size: { w: 7.5, d: 3, h: 1.1 },
     watts: 120,
@@ -195,6 +202,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'speakers',
+    role: 'audio',
     name: 'Powered speakers (pair)',
     size: { w: 6, d: 7, h: 9 },
     watts: 40,
@@ -203,6 +211,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'mic-arm',
+    role: 'peripheral',
     name: 'Mic on arm (USB)',
     size: { w: 2.5, d: 2.5, h: 7 },
     watts: 1,
@@ -211,6 +220,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'webcam',
+    role: 'peripheral',
     name: 'Webcam',
     size: { w: 3.7, d: 1, h: 1.3 },
     watts: 2,
@@ -219,6 +229,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'router',
+    role: 'network',
     name: 'Router',
     size: { w: 9, d: 6, h: 2 },
     watts: 18,
@@ -234,6 +245,7 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'desk-lamp',
+    role: 'appliance',
     name: 'Desk lamp',
     size: { w: 6, d: 6, h: 16 },
     watts: 10,
@@ -242,15 +254,17 @@ export const BUILT_IN_PRESETS: readonly DevicePreset[] = [
   }),
   preset({
     id: 'phone-charger',
+    role: 'appliance',
     name: 'Phone charger stand',
     size: { w: 3.5, d: 3.5, h: 5 },
     watts: 15,
     defaultMount: 'surfaceTop',
     brick: { style: 'wallWart', size: { w: 1.6, d: 1.4, h: 2.2 }, blocksAdjacent: false },
-    ports: backPorts(3.5, 3.5, 0.3, [['usb-c', 'USB-C in']]),
+    ports: backPorts(3.5, 3.5, 0.3, [['dc', 'Power in (USB-C brick)']]),
   }),
   preset({
     id: 'nas',
+    role: 'storage',
     name: 'NAS (2-bay)',
     size: { w: 4, d: 9, h: 6.5 },
     watts: 25,

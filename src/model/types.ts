@@ -180,6 +180,19 @@ export interface Size3 {
   h: Inches;
 }
 
+/** What a device is, which decides what auto-connect wires it to. */
+export type DeviceRole =
+  | 'computer'
+  | 'laptop'
+  | 'dock'
+  | 'display'
+  | 'peripheral'
+  | 'audio'
+  | 'network'
+  | 'storage'
+  | 'appliance'
+  | 'other';
+
 export interface PowerBrick {
   style: 'wallWart' | 'inline';
   size: Size3;
@@ -191,6 +204,8 @@ export interface Device {
   id: Id;
   name: string;
   presetId?: Id;
+  /** Falls back to the preset's role, then a guess from the ports. */
+  role?: DeviceRole;
   size: Size3;
   mount: Mount;
   /** Draw at the wall, in watts. */
@@ -208,6 +223,7 @@ export interface DevicePreset {
   watts: number;
   brick?: PowerBrick;
   ports: Omit<Port, 'id'>[];
+  role?: DeviceRole;
   defaultMount: MountKind;
   builtIn: boolean;
 }

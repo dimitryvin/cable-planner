@@ -46,7 +46,8 @@ function sizeOf(item: Mounted): Size3 {
  */
 export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer; focusSurfaceId?: Id; cursor?: Vec2 }) {
   const { layout, apply } = useLayout();
-  const { selection, select, analysis, filters, cableMode, draft } = useUi();
+  const { selection, select, analysis, filters, cableMode, draft, autoReport } = useUi();
+  const fresh = new Set(autoReport?.added ?? []);
   const { px } = useCanvas();
   const drag = useDrag();
   const tool = useCableTool();
@@ -295,7 +296,7 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
           return (
             <g key={c.id}>
               <path className="cable-hit" d={d} onPointerDown={(e) => { e.stopPropagation(); select({ kind: 'cable', id: c.id }); }} />
-              <path className={`cable ${sel ? 'selected' : ''} ${c.routing} ${segs ? 'faint' : ''}`} d={d} style={{ stroke: color }} />
+              <path className={`cable ${sel ? 'selected' : ''} ${c.routing} ${segs ? 'faint' : ''} ${fresh.has(c.id) ? 'fresh' : ''}`} d={d} style={{ stroke: color }} />
               {strong && <path className={`cable ${sel ? 'selected' : ''} ${c.routing}`} d={strong} style={{ stroke: color }} />}
             </g>
           );
