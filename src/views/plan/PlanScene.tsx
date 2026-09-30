@@ -1,14 +1,13 @@
 import { useState, type PointerEvent as ReactPointerEvent } from 'react';
-import { infraSize, planToSurface, resolveMount, resolvePort, surfaceToPlan, wallFootprint, type OwnerEntry } from '../../geometry/resolve';
+import { infraSize, resolveMount, resolvePort, surfaceToPlan, wallFootprint, type OwnerEntry } from '../../geometry/resolve';
 import { CATEGORY_OF_PORT, SPECS } from '../../model/defaults';
 import type { Device, Id, Infra, Layout, Mount, Port, Size3, Surface, Vec2, WallFeature } from '../../model/types';
-import { pointOverSurface } from '../../routing/network';
 import { updateEntity } from '../../state/actions';
 import { useLayout } from '../../state/store';
 import { useUi } from '../../state/ui';
 import { useCableTool } from '../shared/cableTool';
 import { cableColor } from '../shared/Legend';
-import { dragFloorOrWall, snapFloorPoint, snapOnSurface, snapSurfaceCenter, snapToWall } from '../shared/snap';
+import { dragFloorOrWall, dragSurfaceItem, snapFloorPoint, snapSurfaceCenter, snapToWall } from '../shared/snap';
 import { useCanvas } from '../shared/SvgCanvas';
 import { useDrag } from '../shared/useDrag';
 import { FeatureShape, RoomShape, SurfaceShape } from './shapes';
@@ -53,7 +52,6 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
   const tool = useCableTool();
   const [hoverPort, setHoverPort] = useState<string>();
   const snap = layout.settings.snapToGrid;
-  const grid = layout.settings.gridSize;
 
   const inLayer = (m: Mount) => {
     if (layer === 'all') return true;
@@ -84,18 +82,7 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
         if (!from) break;
         const startPlan = surfaceToPlan(from, startMount.u, startMount.v);
         const plan = { x: startPlan.x + delta.x, y: startPlan.y + delta.y };
-        // Dragged off every surface, the item goes to the floor, or onto a wall if dropped near one.
-        const over = layout.surfaces.find((s) => pointOverSurface(s, world));
-        if (!over) {
-          const asFloor = { on: 'floor' as const, pos: plan, rotation: startMount.rotation };
-          setMount(dragFloorOrWall(layout, asFloor, world, plan, size.d / 2, snap));
-          break;
-        }
-        // Dropping onto another surface moves the item there.
-        const target = over.id !== from.id ? over : from;
-        const { u, v } = planToSurface(target, plan);
-        const snapped = snapOnSurface(target, u, v, { w: size.w / 2, d: size.d / 2 }, grid, snap);
-        setMount({ ...startMount, surfaceId: target.id, ...snapped });
+        setMount(dragSurfaceItem(layout, startMount, plan, world, size, snap));
         break;
       }
       case 'wall':
@@ -294,6 +281,16 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
         </g>
       ))}
 
+      {/* Cable click targets sit below items, so gear under a cable stays grabbable. */}
+      <g className="cable-hits">
+        {cables.map((c) => {
+          const route = analysis.routes.get(c.id);
+          if (!route?.ok || route.points.length < 2) return null;
+          const d = route.points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
+          return <path key={c.id} className="cable-hit" d={d} onPointerDown={(e) => { e.stopPropagation(); select({ kind: 'cable', id: c.id }); }} />;
+        })}
+      </g>
+
       <g className={layer === 'top' ? 'ghost' : ''}>{underItems.filter((m) => m.entity.mount.on !== 'floor').map(renderItem)}</g>
 
       <g className="cables">
@@ -312,7 +309,6 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
           const strong = segs?.map((sg) => `M${sg.a.x.toFixed(2)},${sg.a.y.toFixed(2)} L${sg.b.x.toFixed(2)},${sg.b.y.toFixed(2)}`).join(' ');
           return (
             <g key={c.id}>
-              <path className="cable-hit" d={d} onPointerDown={(e) => { e.stopPropagation(); select({ kind: 'cable', id: c.id }); }} />
               <path className={`cable ${sel ? 'selected' : ''} ${c.routing} ${segs ? 'faint' : ''} ${fresh.has(c.id) ? 'fresh' : ''}`} d={d} style={{ stroke: color }} />
               {strong && <path className={`cable ${sel ? 'selected' : ''} ${c.routing}`} d={strong} style={{ stroke: color }} />}
             </g>

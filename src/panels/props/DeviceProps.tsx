@@ -80,6 +80,7 @@ export function InfraProps({ i, update }: { i: Infra; update: (fn: (i: Infra) =>
         mount={i.mount}
         size={infraSize(i)}
         onChange={(mount) => set({ mount })}
+        wallOrientation={i.kind !== 'raceway'}
         allowed={i.kind === 'raceway' ? ['wall'] : i.kind === 'monitorArm' ? ['surfaceTop', 'wall'] : ['surfaceTop', 'surfaceUnder', 'floor', 'wall']}
       />
       {i.kind === 'powerStrip' && (

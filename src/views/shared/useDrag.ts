@@ -22,23 +22,25 @@ export function useDrag() {
     const sx = e.clientX;
     const sy = e.clientY;
     let moved = false;
-    const target = e.currentTarget as Element;
-    target.setPointerCapture(e.pointerId);
-
+    // Listen on the window, not the element: dragging an item onto a wall or off
+    // a desk re-renders it as a different element mid-drag, and listeners on the
+    // old one would stop receiving moves and the release.
     const move = (ev: PointerEvent) => {
+      if (ev.pointerId !== e.pointerId) return;
       if (!moved && Math.hypot(ev.clientX - sx, ev.clientY - sy) < SLOP) return;
       moved = true;
       handlers.onMove?.(toWorld(ev.clientX, ev.clientY), start);
     };
-    const up = () => {
-      target.removeEventListener('pointermove', move as EventListener);
-      target.removeEventListener('pointerup', up);
-      target.removeEventListener('pointercancel', up);
+    const up = (ev: PointerEvent) => {
+      if (ev.pointerId !== e.pointerId) return;
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
       if (moved) endGesture();
       else handlers.onClick?.();
     };
-    target.addEventListener('pointermove', move as EventListener);
-    target.addEventListener('pointerup', up);
-    target.addEventListener('pointercancel', up);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
   };
 }

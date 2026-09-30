@@ -178,6 +178,7 @@ export function rotateEntity(id: Id, delta: number) {
     const kind = kindOf(l, id);
     if (kind === 'surface') return updateEntity('surface', id, (s) => ({ ...s, rotation: norm(s.rotation + delta) }))(l);
     if (kind !== 'device' && kind !== 'infra') return l;
+    if (!canRotate(l, id)) return l;
     const turn = <T extends { mount: Device['mount'] }>(e: T): T => {
       const m = e.mount;
       if (m.on === 'arm') return e;
@@ -191,6 +192,10 @@ export const canRotate = (l: Layout, id: Id): boolean => {
   const kind = kindOf(l, id);
   if (kind === 'surface') return true;
   if (kind === 'device') return getEntity(l, 'device', id)!.mount.on !== 'arm';
-  if (kind === 'infra') return getEntity(l, 'infra', id)!.mount.on !== 'arm';
+  if (kind === 'infra') {
+    const i = getEntity(l, 'infra', id)!;
+    // Raceways are laid out with their own horizontal/vertical Direction.
+    return i.mount.on !== 'arm' && i.kind !== 'raceway';
+  }
   return false;
 };

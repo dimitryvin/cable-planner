@@ -2,7 +2,7 @@ import { resolvePort, wallFootprint } from '../geometry/resolve';
 import { makePowerStrip, makeSurface } from '../model/factories';
 import { emptyLayout, exampleLayout } from '../model/seed';
 import type { Infra, Layout } from '../model/types';
-import { dragFloorOrWall, WALL_MOUNT_Z } from '../views/shared/snap';
+import { dragFloorOrWall, dragSurfaceItem, WALL_MOUNT_Z } from '../views/shared/snap';
 import { canRotate, rotateEntity } from './actions';
 
 describe('rotating', () => {
@@ -73,5 +73,63 @@ describe('dragging onto and off walls', () => {
     // A plan rotation doesn't turn into a vertical orientation on the wall.
     const turned = { ...floor, rotation: 90 };
     expect(dragFloorOrWall(room, turned, { x: 50, y: 2 }, { x: 50, y: 2 }, 1.1, true)).toMatchObject({ on: 'wall', rotation: 0 });
+  });
+});
+
+describe('dragging desk items', () => {
+  const layout = exampleLayout(); // Standing desk x 32..92, y 1..31; Side table x 108..132, y 1..25
+  const desk = layout.surfaces[0]!;
+  const side = layout.surfaces[1]!;
+  const mini = layout.devices.find((d) => d.name === 'Mac mini')!;
+  const start = mini.mount as Extract<typeof mini.mount, { on: 'surfaceTop' }>;
+  const size = { w: mini.size.w, d: mini.size.d };
+
+  it('stays on its desk while crossing the gap to another desk', () => {
+    const mid = { x: 100, y: 15 }; // 8" from each desk
+    expect(dragSurfaceItem(layout, start, mid, mid, size, true)).toMatchObject({ on: 'surfaceTop', surfaceId: desk.id });
+  });
+
+  it('lands on the other desk once the pointer is over it', () => {
+    const p = { x: 118, y: 15 };
+    expect(dragSurfaceItem(layout, start, p, p, size, true)).toMatchObject({ on: 'surfaceTop', surfaceId: side.id });
+  });
+
+  it('drops to the floor well clear of every desk, keeping its turn in plan', () => {
+    const turned = { ...start, rotation: 90 };
+    const p = { x: 60, y: 80 };
+    expect(dragSurfaceItem(layout, turned, p, p, size, true)).toMatchObject({ on: 'floor', rotation: 90 });
+  });
+
+  it('mounts on a wall when dropped right at it', () => {
+    const p = { x: 2, y: 60 }; // west wall, far from desks
+    expect(dragSurfaceItem(layout, start, p, p, size, true)).toMatchObject({ on: 'wall', at: { wallId: 'w3', z: WALL_MOUNT_Z } });
+  });
+});
+
+describe('floor items near walls', () => {
+  it('can still slide along the floor while standing against a wall', () => {
+    const room = emptyLayout();
+    const start = { on: 'floor' as const, pos: { x: 40, y: 6 }, rotation: 0 };
+    // Pointer on the item's center, 6" from the north wall: stays on the floor.
+    expect(dragFloorOrWall(room, start, { x: 60, y: 6 }, { x: 60, y: 6 }, 3, true).on).toBe('floor');
+  });
+});
+
+describe('raceways', () => {
+  it('are not rotatable (they have their own direction)', () => {
+    const raceway: Infra = {
+      id: 'rw',
+      kind: 'raceway',
+      name: 'Raceway',
+      mount: { on: 'wall', at: { wallId: 'w0', offset: 10, z: 4 } },
+      print3d: false,
+      length: 48,
+      width: 1,
+      depth: 0.6,
+      orientation: 'horizontal',
+    };
+    const l = { ...emptyLayout(), infra: [raceway] };
+    expect(canRotate(l, 'rw')).toBe(false);
+    expect(rotateEntity('rw', 90)(l)).toBe(l);
   });
 });

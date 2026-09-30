@@ -1,6 +1,6 @@
 import { roomWalls, type WallGeom } from '../../geometry/room';
-import { surfaceCorners } from '../../geometry/resolve';
-import type { Id, Layout, Surface, Vec2 } from '../../model/types';
+import { planToSurface, surfaceCorners } from '../../geometry/resolve';
+import type { Id, Layout, Mount, Surface, Vec2 } from '../../model/types';
 
 /** Distance (inches) within which edges pull flush against walls or other surfaces. */
 export const SNAP_DISTANCE = 3;
@@ -122,8 +122,11 @@ export function snapOnSurface(
 
 export type { Id };
 
-/** How close (beyond the item's own half-depth) a dragged floor item must get to a wall to mount on it. */
-export const WALL_GRAB = 4;
+/**
+ * How close the pointer must come to a wall to mount the dragged item on it.
+ * Small on purpose: items standing against a wall can still slide along the floor.
+ */
+export const WALL_GRAB = 2;
 /** How far from the wall a wall-mounted item must be dragged to drop back onto the floor. */
 export const WALL_RELEASE = 12;
 /** Height a floor item gets when it is first dragged onto a wall (typical outlet height). */
@@ -146,7 +149,7 @@ export function dragFloorOrWall(
 ): FloorOrWall {
   const hit = snapToWall(layout, world, snap);
   const distance = hit ? Math.hypot(world.x - (hit.wall.start.x + hit.wall.dir.x * hit.offset), world.y - (hit.wall.start.y + hit.wall.dir.y * hit.offset)) : Infinity;
-  const onWall = start.on === 'wall' ? distance <= WALL_RELEASE : distance <= halfDepth + WALL_GRAB;
+  const onWall = start.on === 'wall' ? distance <= WALL_RELEASE : distance <= WALL_GRAB;
   // A turn in plan and a turn within the wall mean different things, so rotation
   // only carries over while the item stays on the same kind of mount.
   if (onWall && hit) {
@@ -154,4 +157,48 @@ export function dragFloorOrWall(
     return { on: 'wall', at: { wallId: hit.wall.id, offset: hit.offset, z }, rotation: start.on === 'wall' ? (start.rotation ?? 0) : 0 };
   }
   return { on: 'floor', pos: snapFloorPoint(layout, floorPos, halfDepth, snap), rotation: start.on === 'floor' ? start.rotation : 0 };
+}
+
+/** How far from every desk the pointer must be before a desk item drops to the floor. */
+export const FLOOR_DROP = 12;
+
+/** Plan distance from a point to a surface's footprint (0 when over it). */
+export function distanceToSurface(s: Surface, p: Vec2): number {
+  const { u, v } = planToSurface(s, p);
+  const du = Math.max(0, -u, u - s.width);
+  const dv = Math.max(0, -v, v - s.depth);
+  return Math.hypot(du, dv);
+}
+
+type OnSurface = Extract<Mount, { on: 'surfaceTop' | 'surfaceUnder' }>;
+
+/**
+ * Where a dragged desk item ends up: on whichever surface is under the pointer;
+ * while crossing a gap it stays on its desk; right at a wall it mounts there;
+ * well clear of every desk it drops to the floor (keeping its turn in plan).
+ */
+export function dragSurfaceItem(
+  layout: Layout,
+  start: OnSurface,
+  plan: Vec2,
+  world: Vec2,
+  size: { w: number; d: number },
+  snap: boolean,
+): Mount {
+  const from = layout.surfaces.find((s) => s.id === start.surfaceId);
+  if (!from) return start;
+  const place = (s: Surface) => {
+    const { u, v } = planToSurface(s, plan);
+    return { ...start, surfaceId: s.id, ...snapOnSurface(s, u, v, { w: size.w / 2, d: size.d / 2 }, layout.settings.gridSize, snap) };
+  };
+  const over = layout.surfaces.find((s) => distanceToSurface(s, world) === 0);
+  if (over) return place(over);
+
+  const planRotation = (((from.rotation + start.rotation) % 360) + 360) % 360;
+  const nearestDesk = Math.min(...layout.surfaces.map((s) => distanceToSurface(s, world)));
+  const asFloor = { on: 'floor' as const, pos: plan, rotation: planRotation };
+  const wallOrFloor = dragFloorOrWall(layout, asFloor, world, plan, size.d / 2, snap);
+  if (wallOrFloor.on === 'wall') return wallOrFloor;
+  if (nearestDesk > FLOOR_DROP) return wallOrFloor;
+  return place(from);
 }
