@@ -4,6 +4,19 @@ import { SCHEMA_VERSION, type Layout } from './types';
 export type ParseResult = { ok: true; layout: Layout } | { ok: false; error: string };
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+/** Fills cable fields added after a file was saved, so older exports keep working. */
+function normalizeCable(raw: unknown): unknown {
+  if (!isObj(raw)) return raw;
+  const power = raw.spec === 'ac' || raw.spec === 'dc';
+  return {
+    routing: 'auto',
+    waypoints: [],
+    label: '',
+    ...raw,
+    source: raw.source === 'buy' || raw.source === 'owned' || raw.source === 'included' ? raw.source : raw.fixedLength !== undefined || power ? 'included' : 'buy',
+  };
+}
+
 const ARRAY_KEYS = ['features', 'surfaces', 'devices', 'infra', 'cables', 'customPresets'] as const;
 
 /**
@@ -37,7 +50,7 @@ export function parseLayout(input: unknown): ParseResult {
     surfaces: input.surfaces ?? [],
     devices: input.devices ?? [],
     infra: input.infra ?? [],
-    cables: input.cables ?? [],
+    cables: ((input.cables as unknown[] | undefined) ?? []).map(normalizeCable),
     customPresets: input.customPresets ?? [],
   } as Layout;
   return { ok: true, layout };

@@ -245,7 +245,12 @@ export type Infra =
   | (InfraBase & { kind: 'clip'; capacity: Inches })
   | (InfraBase & { kind: 'spine'; length: Inches; capacity: Inches })
   | (InfraBase & { kind: 'monitorArm'; reach: Inches; height: Inches; hasChannel: boolean })
-  | (InfraBase & { kind: 'brickHolder'; size: Size3 });
+  | (InfraBase & {
+      kind: 'brickHolder';
+      /** Inner size; when `forDeviceId` is set, that device's brick size is used instead. */
+      size: Size3;
+      forDeviceId?: Id;
+    });
 
 export type InfraKind = Infra['kind'];
 

@@ -1,0 +1,14 @@
+/* Printable summary: every output section, no app chrome. */
+@media print {
+  :root { --bg: #fff; --panel: #fff; --panel-2: #f3f3f3; --text: #000; --muted: #444; --border: #ccc; }
+  html, body, #root, .app, .main, .center, .view-area, .outputs { height: auto !important; overflow: visible !important; display: block !important; }
+  .toolbar, .pane, .view-tabs, .legend, .hint, .no-print, .fit-btn, .error-banner { display: none !important; }
+  .output { display: block !important; max-width: none; break-inside: auto; page-break-before: always; }
+  .output:first-of-type { page-break-before: auto; }
+  .print-only { display: block; }
+  .print-title h1 { font-size: 20px; margin: 0; }
+  .data { font-size: 10px; border-radius: 0; }
+  .data tr { break-inside: avoid; }
+  .checklist input { display: none; }
+  .checklist label::before { content: '☐ '; }
+}

@@ -7,10 +7,9 @@ import { findPort } from '../geometry/resolve';
 import type { PairOverlap } from './bundles';
 import type { CableLength } from './cableLength';
 import type { Issue } from './issues';
+import { formatLong } from '../model/units';
 
 const name = (c: Cable) => `"${c.label || 'Unnamed cable'}"`;
-const inches = (x: number) => `${x.toFixed(0)}"`;
-const toM = (x: number) => `${((x * 2.54) / 100).toFixed(1)} m`;
 
 export function cableCategory(c: Cable): CableCategory {
   return SPECS[c.spec].category;
@@ -78,6 +77,7 @@ export interface WarningInputs {
 export function cableWarnings({ layout, routes, lengths, pairs }: WarningInputs): Issue[] {
   const issues: Issue[] = [];
   const { settings } = layout;
+  const fmt = (x: number) => formatLong(x, layout.units);
   const cableById = new Map(layout.cables.map((c) => [c.id, c]));
 
   for (const c of layout.cables) {
@@ -96,7 +96,7 @@ export function cableWarnings({ layout, routes, lengths, pairs }: WarningInputs)
         issues.push({
           severity: 'error',
           code: 'cable.cant-reach',
-          message: `${name(c)} is ${inches(c.fixedLength)} but the route needs ${inches(len.worstCase)}${len.standingExtra > 0.5 ? ' at full desk height' : ''}.`,
+          message: `${name(c)} is ${fmt(c.fixedLength)} but the route needs ${fmt(len.worstCase)}${len.standingExtra > 0.5 ? ' at full desk height' : ''}.`,
           refs: [c.id],
         });
       }
@@ -106,7 +106,7 @@ export function cableWarnings({ layout, routes, lengths, pairs }: WarningInputs)
         issues.push({
           severity: 'warn',
           code: 'cable.spec-length',
-          message: `${name(c)} needs ${toM(len.required)}, beyond the ~${toM(spec.maxLength)} typical for passive ${spec.label}. Use an active/optical cable or move the devices closer.`,
+          message: `${name(c)} needs ${fmt(len.required)}, beyond the ~${fmt(spec.maxLength)} typical for passive ${spec.label}. Use an active/optical cable or move the devices closer.`,
           refs: [c.id],
         });
       }
@@ -114,7 +114,7 @@ export function cableWarnings({ layout, routes, lengths, pairs }: WarningInputs)
         issues.push({
           severity: 'warn',
           code: 'cable.retail-overflow',
-          message: `${name(c)} needs ${inches(len.required)}, longer than common retail lengths.`,
+          message: `${name(c)} needs ${fmt(len.required)}, longer than common retail lengths.`,
           refs: [c.id],
         });
       }
@@ -125,7 +125,7 @@ export function cableWarnings({ layout, routes, lengths, pairs }: WarningInputs)
         issues.push({
           severity: 'warn',
           code: 'cable.unsupported',
-          message: `${name(c)} hangs unsupported for ${inches(span.length)} (limit ${inches(settings.maxUnsupportedSpan)}). Add clips, a tray or a spine.`,
+          message: `${name(c)} hangs unsupported for ${fmt(span.length)} (limit ${fmt(settings.maxUnsupportedSpan)}). Add clips, a tray or a spine.`,
           refs: [c.id],
         });
       }
@@ -142,7 +142,7 @@ export function cableWarnings({ layout, routes, lengths, pairs }: WarningInputs)
       issues.push({
         severity: 'warn',
         code: 'cable.open-floor',
-        message: `${name(c)} crosses ${inches(openFloor)} of open floor (trip hazard). Consider a floor cord cover or a different outlet.`,
+        message: `${name(c)} crosses ${fmt(openFloor)} of open floor (trip hazard). Consider a floor cord cover or a different outlet.`,
         refs: [c.id],
       });
     }
@@ -177,7 +177,7 @@ export function cableWarnings({ layout, routes, lengths, pairs }: WarningInputs)
     issues.push({
       severity: 'info',
       code: 'cable.parallel-power',
-      message: `${name(power)} runs alongside ${name(data)} for ${inches(p.length)}. Keep power and data a couple of inches apart or cross at right angles if you see interference.`,
+      message: `${name(power)} runs alongside ${name(data)} for ${fmt(p.length)}. Keep power and data a couple of inches apart or cross at right angles if you see interference.`,
       refs: [power.id, data.id],
     });
   }

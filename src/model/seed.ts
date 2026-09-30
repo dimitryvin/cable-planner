@@ -130,7 +130,7 @@ export function exampleLayout(): Layout {
   const lamp = deviceFromPreset(presetById('desk-lamp'), { on: 'surfaceTop', surfaceId: side.id, u: 12, v: 8, rotation: 0 });
   const router = deviceFromPreset(presetById('router'), { on: 'floor', pos: { x: 110, y: 6 }, rotation: 0 });
   const laptop = deviceFromPreset(presetById('laptop'), { on: 'surfaceTop', surfaceId: desk.id, u: 18, v: 20, rotation: 0 });
-  dock.print3d = false;
+  const holder = { ...brickHolder, forDeviceId: dock.id };
 
   const stripCord = {
     ...connect(portOf(strip, 'ac', 0), portOf(outletN, 'ac', 0), 'Power strip cord'),
@@ -158,7 +158,7 @@ export function exampleLayout(): Layout {
     features: [outletN, outletE, jack, window, heater],
     surfaces: [desk, side],
     devices: [monitor, mini, dock, speakers, lamp, router, laptop],
-    infra: [arm, tray, strip, spine, brickHolder],
+    infra: [arm, tray, strip, spine, holder],
     cables,
   };
 }

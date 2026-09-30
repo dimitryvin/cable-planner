@@ -37,6 +37,23 @@ describe('persistence', () => {
     expect(r.ok && r.layout.settings.slackPct).toBe(0.15);
   });
 
+  it('fills cable fields missing from older files', () => {
+    const r = deserializeLayout(
+      JSON.stringify({
+        schemaVersion: 1,
+        room: { shape: { kind: 'rect', width: 100, depth: 80 }, labelStyle: 'compass', ceilingHeight: 96 },
+        cables: [
+          { id: 'a', from: { ownerId: 'x', portId: 'y' }, to: { ownerId: 'x', portId: 'z' }, spec: 'hdmi2.1' },
+          { id: 'b', from: { ownerId: 'x', portId: 'y' }, to: { ownerId: 'x', portId: 'z' }, spec: 'ac' },
+        ],
+      }),
+    );
+    expect(r.ok && r.layout.cables.map((c) => [c.source, c.routing, c.waypoints.length])).toEqual([
+      ['buy', 'auto', 0],
+      ['included', 'auto', 0],
+    ]);
+  });
+
   it('returns undefined for corrupt storage', () => {
     expect(loadFromStorage({ getItem: () => '{broken' })).toBeUndefined();
   });

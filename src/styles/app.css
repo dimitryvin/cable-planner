@@ -200,3 +200,36 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .standing-range text, .dim-label { fill: var(--muted); font-family: var(--font); }
 .elevation .item.device rect { cursor: ns-resize; }
 .elev-floor { vector-effect: non-scaling-stroke; stroke-width: 3; }
+
+/* Outputs */
+.outputs { height: 100%; overflow: auto; padding: 0 20px 40px; }
+.output-tabs { position: sticky; top: 0; display: flex; gap: 2px; padding: 10px 0; background: var(--bg); z-index: 1; align-items: center; }
+.output-tabs button:not(.btn) { border: 0; background: transparent; padding: 5px 10px; border-radius: 6px; cursor: pointer; color: var(--muted); }
+.output-tabs button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.output-tabs .spacer { flex: 1; }
+.output { display: none; max-width: 1000px; }
+.output.active { display: block; }
+.output h2 { font-size: 18px; margin: 8px 0; }
+.output h3 { font-size: 13px; margin: 16px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.export-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.data { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.data th, .data td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); background: var(--panel-2); }
+.data tr:last-child td { border-bottom: 0; }
+.data tr.clickable { cursor: pointer; }
+.data tr.clickable:hover td { background: var(--accent-soft); }
+.data tr.suggested td { color: var(--muted); }
+.data .qty { width: 48px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.data .num, .mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mono { font-family: var(--mono); font-size: 12px; }
+.checklist { padding-left: 20px; }
+.checklist > li { margin-bottom: 12px; }
+.checklist h3 { color: var(--text); text-transform: none; letter-spacing: 0; font-size: 14px; margin: 0 0 4px; }
+.checklist ul { list-style: none; padding: 0; margin: 0; }
+.checklist label { display: flex; gap: 6px; padding: 2px 0; cursor: pointer; }
+.checklist .done { text-decoration: line-through; color: var(--muted); }
+.meter { display: inline-block; width: 80px; height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden; margin-right: 8px; vertical-align: middle; }
+.meter .fill { height: 100%; background: var(--ok); }
+.meter .fill.warn { background: var(--warn); }
+.meter .fill.error { background: var(--danger); }
+.print-only { display: none; }

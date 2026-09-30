@@ -59,6 +59,7 @@ export function DeviceProps({ d, update }: { d: Device; update: (fn: (d: Device)
 }
 
 export function InfraProps({ i, update }: { i: Infra; update: (fn: (i: Infra) => Infra) => void }) {
+  const { layout } = useLayout();
   const set = (patch: Partial<Infra>) => update((x) => ({ ...x, ...patch }) as Infra);
   const num = (key: string, label: string, min = 0.1) => (
     <LengthField label={label} min={min} value={(i as unknown as Record<string, number>)[key]!} onChange={(v) => set({ [key]: v } as Partial<Infra>)} />
@@ -106,6 +107,12 @@ export function InfraProps({ i, update }: { i: Infra; update: (fn: (i: Infra) =>
       )}
       {i.kind === 'brickHolder' && (
         <>
+          <SelectField
+            label="Holds brick of"
+            value={i.forDeviceId ?? ''}
+            options={[['', 'Custom size'], ...layout.devices.filter((d) => d.brick).map((d) => [d.id, d.name] as const)]}
+            onChange={(forDeviceId) => set({ forDeviceId: forDeviceId || undefined } as Partial<Infra>)}
+          />
           <LengthField label="Inner width" min={0.1} value={i.size.w} onChange={(w) => set({ size: { ...i.size, w } } as Partial<Infra>)} />
           <LengthField label="Inner depth" min={0.1} value={i.size.d} onChange={(dd) => set({ size: { ...i.size, d: dd } } as Partial<Infra>)} />
           <LengthField label="Inner height" min={0.1} value={i.size.h} onChange={(h) => set({ size: { ...i.size, h } } as Partial<Infra>)} />

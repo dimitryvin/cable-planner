@@ -3,6 +3,7 @@ import { Legend } from './shared/Legend';
 import { RoomView } from './RoomView';
 import { DeskView } from './DeskView';
 import { ElevationView } from './ElevationView';
+import { OutputsView } from '../outputs/OutputsView';
 
 export function ViewArea() {
   const { view, cableMode, draft } = useUi();
@@ -11,7 +12,7 @@ export function ViewArea() {
       {view === 'room' && <RoomView />}
       {view === 'desk' && <DeskView />}
       {view === 'elevation' && <ElevationView />}
-      {view === 'outputs' && <div className="muted" style={{ padding: 24 }}>outputs coming next</div>}
+      {view === 'outputs' && <OutputsView />}
       {view !== 'outputs' && <Legend />}
       {cableMode && (
         <div className="hint">

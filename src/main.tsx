@@ -5,6 +5,7 @@ import { LayoutProvider } from './state/store';
 import { UiProvider } from './state/ui';
 import './styles/tokens.css';
 import './styles/app.css';
+import './styles/print.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing #root element');
