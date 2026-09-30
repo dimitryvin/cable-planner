@@ -1,0 +1,23 @@
+src/styles/app.css
+  s_6e6971b8198af2::t_4cb60dffdfe8c2 105-115,258,261-264
+src/views/shared/AutoConnectBanner.tsx
+  s_6e6971b8198af2::t_38c9ec03058d82 15,17-22
+tsconfig.tsbuildinfo
+  s_6e6971b8198af2::t_855ff2fd1211c3 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c68625fd05f8cacd5d420d4125c56aeae8540367",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
