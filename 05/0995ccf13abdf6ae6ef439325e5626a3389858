@@ -1,0 +1,23 @@
+LICENSE
+  s_6e6971b8198af2::t_461a926960333b 1-21
+README.md
+  s_6e6971b8198af2::t_871c2ab9ec0723 7,24-31,75-78
+package.json
+  s_6e6971b8198af2::t_96ec195bfb4ee9 6-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "050995ccf13abdf6ae6ef439325e5626a3389858",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
