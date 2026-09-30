@@ -1,0 +1,72 @@
+src/routing/network.ts
+  s_6e6971b8198af2::t_d87aee1a0f02a6 83-84,361,482-485,487,490-491,494
+  s_6e6971b8198af2::t_a0bf03910bc204 232
+  s_6e6971b8198af2::t_08506adc55574f 108-116
+  s_6e6971b8198af2::t_fec535067d652c 1-82,85-107,117-231,233-360,362-416,418-481,486,488-489,492-493,495-504
+  s_6e6971b8198af2::t_fe4a9f40296fbd 417
+src/model/seed.ts
+  s_6e6971b8198af2::t_9d9de0ba415ba1 153
+src/routing/dijkstra.ts
+  s_6e6971b8198af2::t_2f460bd9f27027 1-84
+  s_6e6971b8198af2::t_98abd1e35932a1 85-90
+src/calc/retail.ts
+  s_6e6971b8198af2::t_d13f0a1b2d76bc 1-25
+src/calc/bundles.ts
+  s_6e6971b8198af2::t_adc44cd50d52c9 23,33,138,142,145,148
+  s_6e6971b8198af2::t_5d0f601237925d 1-22,24-32,34-137,139-141,143-144,146-147,149-242
+src/model/types.ts
+  s_6e6971b8198af2::t_ed6f1ac416a3c0 299-302
+  s_6e6971b8198af2::t_272d7761e0e60f 298
+src/calc/analyze.ts
+  s_6e6971b8198af2::t_a0bf03910bc204 1-63
+tsconfig.tsbuildinfo
+  s_6e6971b8198af2::t_7ffe378c2a68e2 1
+src/calc/cableLength.test.ts
+  s_6e6971b8198af2::t_d13f0a1b2d76bc 1-35
+src/calc/cableLength.ts
+  s_6e6971b8198af2::t_d13f0a1b2d76bc 1-47
+src/calc/power.ts
+  s_6e6971b8198af2::t_429ac1a97d4a05 1-240
+src/calc/analyze.test.ts
+  s_6e6971b8198af2::t_a0bf03910bc204 1-14,18-23,25-26,32-37,40,42,44-45
+  s_6e6971b8198af2::t_7ffe378c2a68e2 15-17,24,27-31,38-39,41,43
+src/calc/bundles.test.ts
+  s_6e6971b8198af2::t_ddd53d84a5ca72 1-96
+src/routing/dijkstra.test.ts
+  s_6e6971b8198af2::t_2f460bd9f27027 1-27
+src/calc/warnings.ts
+  s_6e6971b8198af2::t_a0bf03910bc204 1-186
+src/calc/power.test.ts
+  s_6e6971b8198af2::t_b256eb0258a49c 1-108
+src/model/factories.ts
+  s_6e6971b8198af2::t_ed6f1ac416a3c0 148
+src/calc/issues.ts
+  s_6e6971b8198af2::t_d13f0a1b2d76bc 1-21
+src/calc/warnings.test.ts
+  s_6e6971b8198af2::t_7ffe378c2a68e2 1-29
+src/calc/retail.test.ts
+  s_6e6971b8198af2::t_d13f0a1b2d76bc 1-17,19-31
+  s_6e6971b8198af2::t_a37881f61978c1 18
+src/routing/route.ts
+  s_6e6971b8198af2::t_08506adc55574f 98,122,155,164
+  s_6e6971b8198af2::t_fe4a9f40296fbd 1-97,99-121,123-154,156-163,165-289
+src/routing/route.test.ts
+  s_6e6971b8198af2::t_b2ca1fc86cdc9d 13,102,106-107,115-116
+  s_6e6971b8198af2::t_0c1acd5063e25e 1-12,14-101,103-105,108-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b3fb745b60620d9e944725e2c0ec831fcf1cad54",
+  "prompts": {},
+  "sessions": {
+    "s_6e6971b8198af2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0359c0b-de1f-41af-8dc4-9a7b2ea81c0c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dimitry Vinogradov <dimitryvin@gmail.com>"
+    }
+  }
+}
