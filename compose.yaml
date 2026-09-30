@@ -1,0 +1,16 @@
+services:
+  cable-planner:
+    build: .
+    image: cable-planner:latest
+    container_name: cable-planner
+    restart: unless-stopped
+    # Bound to loopback; the host's reverse proxy terminates TLS in front of it.
+    ports:
+      - "127.0.0.1:${CABLE_PLANNER_PORT:-3095}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
