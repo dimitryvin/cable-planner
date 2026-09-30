@@ -182,3 +182,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .port.start { stroke: var(--accent); stroke-width: 3; }
 .port-label { fill: var(--text); font-family: var(--font); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; vector-effect: non-scaling-stroke; pointer-events: none; }
 .cable-mode .canvas { cursor: crosshair; }
+.view-toolbar { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; z-index: 1; align-items: center; }
+.view-toolbar .input { width: auto; background: var(--panel); }
+.view-toolbar .seg { background: var(--panel); }
+.empty { padding: 32px; color: var(--muted); }
+.layer-under .surface .top { fill-opacity: 0.35; }
+.cable.faint { opacity: 0.18; }

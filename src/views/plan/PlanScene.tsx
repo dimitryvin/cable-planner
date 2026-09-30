@@ -284,10 +284,19 @@ export function PlanScene({ layer, focusSurfaceId, cursor }: { layer: PlanLayer;
           if (!route?.ok || route.points.length < 2) return null;
           const d = route.points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
           const sel = selectedId === c.id;
+          const color = cableColor(SPECS[c.spec].category);
+          // In the desk view, fade the parts of a cable that are on the other layer.
+          const top = focus ? focus.height - focus.thickness / 2 : 0;
+          const segs =
+            focus && layer !== 'all'
+              ? route.segments.filter((sg) => (layer === 'top' ? Math.min(sg.a.z, sg.b.z) >= top : Math.max(sg.a.z, sg.b.z) < top))
+              : undefined;
+          const strong = segs?.map((sg) => `M${sg.a.x.toFixed(2)},${sg.a.y.toFixed(2)} L${sg.b.x.toFixed(2)},${sg.b.y.toFixed(2)}`).join(' ');
           return (
             <g key={c.id}>
               <path className="cable-hit" d={d} onPointerDown={(e) => { e.stopPropagation(); select({ kind: 'cable', id: c.id }); }} />
-              <path className={`cable ${sel ? 'selected' : ''} ${c.routing}`} d={d} style={{ stroke: cableColor(SPECS[c.spec].category) }} />
+              <path className={`cable ${sel ? 'selected' : ''} ${c.routing} ${segs ? 'faint' : ''}`} d={d} style={{ stroke: color }} />
+              {strong && <path className={`cable ${sel ? 'selected' : ''} ${c.routing}`} d={strong} style={{ stroke: color }} />}
             </g>
           );
         })}
